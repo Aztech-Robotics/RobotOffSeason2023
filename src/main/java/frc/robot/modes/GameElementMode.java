@@ -1,27 +1,27 @@
-package frc.robot;
+package frc.robot.modes;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.Constants.GeneralModeEnum;
+import frc.robot.Constants.GameElement;
 
-public class GeneralMode {
-    private static GeneralMode generalMode = null;
-    private static GeneralModeEnum activeMode;
+public class GameElementMode {
+    private static GameElementMode generalMode = null;
+    private static GameElement activeMode;
     private boolean notifier = false;
 
-    private GeneralMode (){}
+    private GameElementMode (){}
 
-    public static GeneralMode getInstance (){
+    public static GameElementMode getInstance (){
         if (generalMode == null){
-            generalMode = new GeneralMode();
-            activeMode = GeneralModeEnum.Cone;
+            generalMode = new GameElementMode();
+            activeMode = GameElement.Cone;
         }
         return generalMode;
     }
     
-    public GeneralModeEnum getMode (){
+    public GameElement getMode (){
         return activeMode; 
     }
-    public void setMode (GeneralModeEnum mode){
+    public void setMode (GameElement mode){
         notifier = true;
         activeMode = mode;
     }
@@ -30,11 +30,11 @@ public class GeneralMode {
         notifier = true;
         InstantCommand command = new InstantCommand(
             () -> {
-                if (activeMode == GeneralModeEnum.Cone){
-                    activeMode = GeneralModeEnum.Cube;
+                if (activeMode == GameElement.Cone){
+                    activeMode = GameElement.Cube;
                 }
                 else {
-                    activeMode = GeneralModeEnum.Cone;
+                    activeMode = GameElement.Cone;
                 }
             }
         );

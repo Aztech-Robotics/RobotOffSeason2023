@@ -8,9 +8,9 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.PathBase;
+import frc.robot.interfaces.PathInterface;
 
-public class SamplePathWithTwist implements PathBase {
+public class SamplePathWithTwist implements PathInterface {
     private PathPlannerTrajectory trajectory = PathPlanner.loadPath("Calibration", new PathConstraints(4, 3));
     public SamplePathWithTwist (){
     }

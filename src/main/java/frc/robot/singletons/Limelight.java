@@ -1,14 +1,24 @@
-package frc.robot.limelight;
+package frc.robot.singletons;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import frc.robot.GeneralMode;
 import frc.robot.Constants.TypePipeline;
+import frc.robot.utils.LimelightHelpers;
 
 public class Limelight {
+  private static Limelight limelight;
   private TypePipeline activePipeline;
 
-  public Limelight() {
-    setPipelineByGeneralMode();
+  private Limelight() {}
+
+  public static Limelight getInstance (){
+    if (limelight == null){
+      limelight = new Limelight();
+    }
+    return limelight;
+  }
+
+  public String getURL (){
+    return LimelightHelpers.getLimelightURLString("limelight", "").getPath();
   }
 
   public double getTagID (){
@@ -49,20 +59,22 @@ public class Limelight {
       case RetroflectiveTape:
       LimelightHelpers.setPipelineIndex(null, 0);
       break;
-      case AprilTag:
+      case GridsAprilTags:
       LimelightHelpers.setPipelineIndex(null, 1);
+      break;
+      case LeftDSubAprilTag:
+      LimelightHelpers.setPipelineIndex(null, 2);
+      break;
+      case RightDSubAprilTag:
+      LimelightHelpers.setPipelineIndex(null, 3);
+      break;
+      case GameElementDetection:
+      LimelightHelpers.setPipelineIndex(null, 4);
       break;
     }
   }
 
-  public void setPipelineByGeneralMode (){
-    switch (GeneralMode.getInstance().getMode()){
-      case Cone:
-      setPipeline(TypePipeline.RetroflectiveTape);
-      break;
-      case Cube:
-      setPipeline(TypePipeline.AprilTag);
-      break;
-    }
+  public TypePipeline getActivePipeline (){
+    return activePipeline;
   }
 }

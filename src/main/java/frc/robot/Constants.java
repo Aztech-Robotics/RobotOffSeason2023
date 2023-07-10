@@ -64,13 +64,16 @@ public final class Constants {
     AutoBalance
   }
 
-  public static enum GeneralModeEnum {
+  public static enum GameElement {
     Cone,
     Cube
   }
 
   public static enum TypePipeline {
-    AprilTag,
-    RetroflectiveTape
+    GridsAprilTags,
+    RetroflectiveTape,
+    LeftDSubAprilTag,
+    RightDSubAprilTag,
+    GameElementDetection
   }
 }

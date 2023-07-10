@@ -7,9 +7,9 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.PathBase;
+import frc.robot.interfaces.PathInterface;
 
-public class SamplePath implements PathBase {
+public class SamplePath implements PathInterface {
     private PathPlannerTrajectory trajectory = PathPlanner.loadPath("SamplePath", new PathConstraints(4, 3));
     public SamplePath (){
     }

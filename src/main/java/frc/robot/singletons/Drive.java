@@ -1,4 +1,6 @@
-package frc.robot.subsystems;
+package frc.robot.singletons;
+
+import java.util.List;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,13 +17,14 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveMode;
-import frc.robot.limelight.Limelight;
+import frc.robot.interfaces.AutoInterface;
 import frc.robot.swerve.SwerveModule;
 
-public class Drive extends SubsystemBase {
+public class Drive extends SubsystemBase implements AutoInterface  {
   private static Drive drive;
   public static SwerveDriveKinematics swerveDriveKinematics = new SwerveDriveKinematics(
     //FrontLeft
@@ -40,7 +43,7 @@ public class Drive extends SubsystemBase {
   private SwerveModuleState[] modules_states;
   private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
   private ShuffleboardTab tabDrive = Shuffleboard.getTab("DriveData"); 
-  private Limelight limelight = new Limelight(); 
+  private Limelight limelight = Limelight.getInstance(); 
   
   private Drive() {
     modules[0] = new SwerveModule(
@@ -215,6 +218,14 @@ public class Drive extends SubsystemBase {
   }
 
   public void outputTelemetry (){
-    tabDrive.addDouble("GyroAngle", ()->{return getGyroAngle().getDegrees();}); 
+    tabDrive.addDouble("X Pose Odometry", ()->{return getCurrentPose().getX();}).withPosition(8, 0);
+    tabDrive.addDouble("Y Pose Odometry", ()->{return getCurrentPose().getY();}).withPosition(9, 0);
+    tabDrive.addDouble("GyroAngle", ()->{return getGyroAngle().getDegrees();}).withPosition(8, 1); 
+    tabDrive.addDouble("TAG ID", ()->{return limelight.getTagID();}).withPosition(9, 1);
+  }
+
+  @Override
+  public List<Command> getAutoRoutine (){
+    return null;
   }
 }

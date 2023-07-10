@@ -8,10 +8,10 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.PathBase;
 import frc.robot.commands.TestCommandTrajectory;
+import frc.robot.interfaces.PathInterface;
 
-public class SamplePathWithEvents implements PathBase {
+public class SamplePathWithEvents implements PathInterface {
     private PathPlannerTrajectory trajectory = PathPlanner.loadPath("SamplePathWithEvents", new PathConstraints(0.5, 0.5));
     public SamplePathWithEvents (){
     }

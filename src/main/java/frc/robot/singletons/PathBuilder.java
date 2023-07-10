@@ -1,15 +1,15 @@
-package frc.robot;
+package frc.robot.singletons;
 
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Drive;
+import frc.robot.interfaces.PathInterface;
 
 public class PathBuilder {
     private static PathBuilder pathBuilder;
     private final Drive m_swerveDrive = Drive.getInstance(); 
-    private PathBase m_autoBase;
+    private PathInterface m_autoBase;
 
     private PathBuilder (){}
 
@@ -20,7 +20,7 @@ public class PathBuilder {
         return pathBuilder;
     }
 
-    public Command createCommand (PathBase autoBase){
+    public Command createCommand (PathInterface autoBase){
         SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
             m_swerveDrive::getCurrentPose, 
             m_swerveDrive::setCurrentPose, 
