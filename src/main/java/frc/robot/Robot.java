@@ -12,6 +12,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     telemetry = Telemetry.getInstance();
+    
   }
 
   @Override

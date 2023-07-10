@@ -24,7 +24,7 @@ import frc.robot.Constants.SwerveMode;
 import frc.robot.interfaces.AutoInterface;
 import frc.robot.swerve.SwerveModule;
 
-public class Drive extends SubsystemBase implements AutoInterface  {
+public class Drive extends SubsystemBase  {
   private static Drive drive;
   public static SwerveDriveKinematics swerveDriveKinematics = new SwerveDriveKinematics(
     //FrontLeft
@@ -222,10 +222,5 @@ public class Drive extends SubsystemBase implements AutoInterface  {
     tabDrive.addDouble("Y Pose Odometry", ()->{return getCurrentPose().getY();}).withPosition(9, 0);
     tabDrive.addDouble("GyroAngle", ()->{return getGyroAngle().getDegrees();}).withPosition(8, 1); 
     tabDrive.addDouble("TAG ID", ()->{return limelight.getTagID();}).withPosition(9, 1);
-  }
-
-  @Override
-  public List<Command> getAutoRoutine (){
-    return null;
   }
 }

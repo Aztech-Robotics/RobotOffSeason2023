@@ -69,6 +69,11 @@ public final class Constants {
     Cube
   }
 
+  public static enum PlayMode {
+    PickUp,
+    Score
+  }
+
   public static enum TypePipeline {
     GridsAprilTags,
     RetroflectiveTape,

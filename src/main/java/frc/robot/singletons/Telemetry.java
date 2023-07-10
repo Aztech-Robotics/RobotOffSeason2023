@@ -74,6 +74,10 @@ public class Telemetry {
     }
   }
 
+  private void displayStations (){
+    
+  }
+
   private Command generateAutoCommand (AutoInterface auto){
     SequentialCommandGroup autoCommand = new SequentialCommandGroup();
     for (Command command : auto.getAutoRoutine()) {
