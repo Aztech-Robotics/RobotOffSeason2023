@@ -146,8 +146,8 @@ public class SwerveModule {
 
     public void outputTelemetry (){
         ShuffleboardLayout motorsData = tabMotorsData.getLayout("Module " + speedMotor1.getDeviceId() + "-" + steerMotor.getDeviceID(), BuiltInLayouts.kList).withSize(2, 3);
-        motorsData.addDouble("SpeedMotorPosition", () -> {return getPositionSpeedMotor();});
-        motorsData.addDouble("SpeedMotorVelocity", () -> {return getVelocitySpeedMotor();});
-        motorsData.addDouble("CanCoderAngle", () -> {return getCanCoderAngle().getRotations();});
+        motorsData.addDouble("SpeedMotorPosition", () -> getPositionSpeedMotor());
+        motorsData.addDouble("SpeedMotorVelocity", () -> getVelocitySpeedMotor());
+        motorsData.addDouble("CanCoderAngle", () -> getCanCoderAngle().getRotations());
     }
 }

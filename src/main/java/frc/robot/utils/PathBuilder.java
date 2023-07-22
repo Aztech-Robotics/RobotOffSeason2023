@@ -1,10 +1,11 @@
-package frc.robot.singletons;
+package frc.robot.utils;
 
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.interfaces.PathInterface;
+import frc.robot.subsystems.Drive;
 
 public class PathBuilder {
     private static PathBuilder pathBuilder;

@@ -4,8 +4,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
-  public static final double trackWidth = Units.inchesToMeters(20);
-  public static final double wheelBase = Units.inchesToMeters(20);
+  public static final double trackWidth = Units.inchesToMeters(25);
+  public static final double wheelBase = Units.inchesToMeters(25);
   public static final double wheelDiameter = 0.1;
   public static final double max_rpm_neo = 5676;
   public static final double max_rpm_talon = 6380;
@@ -43,6 +43,23 @@ public final class Constants {
   public static final int id_drive1_bRight = 15;
   public static final int id_drive2_bRight = 16;
   public static final Rotation2d offset_bRight = Rotation2d.fromDegrees(0); 
+  
+  public static final int id_arm_master = 17;
+  public static final int id_arm_sleeve = 18;
+  public static final double arm_reduction = 0;
+  public static final double kp_arm = 0;
+  public static final double ki_arm = 0;
+  public static final double kd_arm = 0;
+  public static final double kf_arm = 0;
+
+  public static final int id_tel_master = 19;
+  public static final int id_tel_sleeve = 20;
+
+  public static final int id_wrist = 21;
+
+  public static final int id_art = 22;
+
+  public static final int id_intake = 23;
 
   public static final double kp_steerController = 0.0;
   public static final double ki_steerController = 0.0;
@@ -69,9 +86,11 @@ public final class Constants {
     Cube
   }
 
-  public static enum PlayMode {
+  public static enum MechanismMode {
     PickUp,
-    Score
+    Score,
+    SaveMechanism,
+    ManualMode
   }
 
   public static enum TypePipeline {

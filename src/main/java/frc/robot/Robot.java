@@ -3,16 +3,14 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.singletons.Telemetry;
 
 public class Robot extends TimedRobot {
+  private Telemetry robotContainer;
   private Command m_autonomousCommand;
-  private Telemetry telemetry;
 
   @Override
   public void robotInit() {
-    telemetry = Telemetry.getInstance();
-    
+    robotContainer = new Telemetry();
   }
 
   @Override
@@ -28,7 +26,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = telemetry.getAutonomousCommand();
+    m_autonomousCommand = robotContainer.getAutonomousCommand();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }

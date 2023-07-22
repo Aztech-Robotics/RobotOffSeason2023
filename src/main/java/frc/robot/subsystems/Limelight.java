@@ -1,4 +1,4 @@
-package frc.robot.singletons;
+package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.Constants.TypePipeline;

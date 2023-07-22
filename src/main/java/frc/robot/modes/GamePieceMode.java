@@ -1,18 +1,21 @@
 package frc.robot.modes;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.Telemetry;
 import frc.robot.Constants.GameElement;
 
-public class GameElementMode {
-    private static GameElementMode generalMode = null;
+public class GamePieceMode {
+    private static GamePieceMode generalMode = null;
     private static GameElement activeMode;
     private boolean notifier = false;
 
-    private GameElementMode (){}
+    private GamePieceMode (){}
 
-    public static GameElementMode getInstance (){
+    public static GamePieceMode getInstance (){
         if (generalMode == null){
-            generalMode = new GameElementMode();
+            generalMode = new GamePieceMode();
             activeMode = GameElement.Cone;
         }
         return generalMode;
@@ -21,9 +24,20 @@ public class GameElementMode {
     public GameElement getMode (){
         return activeMode; 
     }
+
     public void setMode (GameElement mode){
         notifier = true;
         activeMode = mode;
+    }
+
+    public InstantCommand commandSetMode (GameElement mode){
+        InstantCommand command = new InstantCommand(
+            () -> {
+                notifier = true;
+                activeMode = mode; 
+            }
+        );
+        return command;
     }
 
     public InstantCommand toggleMode (){
@@ -49,5 +63,16 @@ public class GameElementMode {
         else {
             return false;
         }
+    }
+
+    public void outputTelemetry (){
+        Telemetry.tabDriver.addBoolean("GamePiece", 
+        () -> {
+            boolean value = false;
+            if (GamePieceMode.getInstance().getMode() == GameElement.Cone){
+                value = true;
+            }
+            return value;
+        }).withSize(1, 1).withPosition(4, 3);
     }
 }
