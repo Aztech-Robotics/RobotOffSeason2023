@@ -8,6 +8,7 @@ public class ScoreTop extends ActionClass implements ActionInterface {
     public ScoreTop (){
     }
 
+    @Override
     public Command getActionCommand (){
         return super.selectActionCommand(this);
     }

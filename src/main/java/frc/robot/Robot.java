@@ -5,12 +5,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends TimedRobot {
-  private Telemetry robotContainer;
+  private RobotContainer robotContainer;
   private Command m_autonomousCommand;
 
   @Override
   public void robotInit() {
-    robotContainer = new Telemetry();
+    robotContainer = new RobotContainer();
   }
 
   @Override

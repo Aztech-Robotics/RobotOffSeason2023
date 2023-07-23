@@ -1,13 +1,10 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.event.BooleanEvent;
-import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.MechanismMode;
 import frc.robot.modes.GamePieceMode;
 import frc.robot.modes.MechanismActionMode;
@@ -21,9 +18,7 @@ public class RobotContainer {
         telemetry = new Telemetry();
     }
 
-    public void modeBindings (EventLoop modesLoop){
-        BooleanEvent gamePieceChanged = new BooleanEvent(modesLoop, () -> gamePieceMode.haveChanged());
-        gamePieceChanged.ifHigh(null);
+    public void modeBindings (){
     }
 
     public void controlBindings (){
@@ -68,13 +63,14 @@ public class RobotContainer {
             }
         );
         Controls.movingLeftJD2().whileTrue(new RepeatCommand(new SequentialCommandGroup(moveActiveBox, new WaitCommand(0.3))));
-
+        Controls.getRBumperD2().toggleOnTrue(moveActiveBox2);
     }
 
     public Command getAutonomousCommand (){
         return telemetry.getAutonomousCommand();
     }
 }
+
 /*
  * Driver 1
  * Joysticks - Swerve
