@@ -1,19 +1,11 @@
 package frc.robot.swerve;
 
-import com.ctre.phoenix6.configs.MagnetSensorConfigs;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
+import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -27,127 +19,161 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants;
 
 public class SwerveModule {
-    private TalonFX steerMotor;
-    private CANSparkMax speedMotor1, speedMotor2;
+    private CANSparkMax speedMotor;
     private RelativeEncoder encoder_speedMotor;
     private SparkMaxPIDController controller_speedMotor;
-    private CANcoder cancoder;
-    ShuffleboardTab tabMotorsData = Shuffleboard.getTab("MotorsData");
-    public boolean isBrakeMode = false;
+    private CANSparkMax steerMotor;
+    private RelativeEncoder encoder_steerMotor;
+    private SparkMaxPIDController controller_steerMotor;
+    private CANCoder cancoder_steerMotor;
+    private ShuffleboardTab tabSwerve = Shuffleboard.getTab("SwerveData");
+    private SwerveModuleState desiredState = new SwerveModuleState();
+    public boolean isBrakeMode = false; 
 
-    
-    public SwerveModule (int id_steerMotor, int id_cancoder, int id_speedMotor1, int id_speedMotor2, Rotation2d steerOffset){
-        //Variables Initialization 
-        steerMotor = new TalonFX(id_steerMotor);
-        speedMotor1 = new CANSparkMax(id_speedMotor1, MotorType.kBrushless);
-        speedMotor2 = new CANSparkMax(id_speedMotor2, MotorType.kBrushless);
-        encoder_speedMotor = speedMotor1.getEncoder();
-        controller_speedMotor = speedMotor1.getPIDController();
-        cancoder = new CANcoder(id_cancoder);
-        //CanCoder Configuration
-        MagnetSensorConfigs canCoderConfig = new MagnetSensorConfigs();
-        canCoderConfig.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-        canCoderConfig.MagnetOffset = 0;
-        canCoderConfig.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        cancoder.getConfigurator().apply(canCoderConfig);
-        //SteerMotor Configuration
-        TalonFXConfiguration talonConfig = new TalonFXConfiguration();
-        talonConfig.ClosedLoopGeneral.ContinuousWrap = true;
-        talonConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        talonConfig.CurrentLimits.StatorCurrentLimit = 100;
-        talonConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
-        talonConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
-        talonConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        talonConfig.Slot0.kS = Constants.ks_steerController;
-        talonConfig.Slot0.kV = Constants.kv_steerController;
-        talonConfig.Slot0.kP = Constants.kp_steerController;
-        talonConfig.Slot0.kI = Constants.ki_steerController;
-        talonConfig.Slot0.kD = Constants.kd_steerController;
-        steerMotor.getConfigurator().apply(talonConfig);
-        //SpeedMotor Configuration
-        speedMotor1.enableVoltageCompensation(12);
-        speedMotor2.enableVoltageCompensation(12);
-        speedMotor2.follow(speedMotor1);
+
+    public SwerveModule (int id_speedMotor, int id_steerMotor, int id_steerCanCoder, Rotation2d steerOffset){
+        speedMotor = new CANSparkMax(id_speedMotor, MotorType.kBrushless);
+        encoder_speedMotor = speedMotor.getEncoder();
         encoder_speedMotor.setPositionConversionFactor(Constants.drivePositionCoefficient);
-        encoder_speedMotor.setVelocityConversionFactor(Constants.driveVelocityCoefficient);
-        controller_speedMotor.setP(Constants.kp_speedController);
-        controller_speedMotor.setI(Constants.ki_speedController);
-        controller_speedMotor.setD(Constants.ki_speedController);
-        controller_speedMotor.setFF(Constants.kf_speedController);
-        controller_speedMotor.setIZone(Constants.kIz_speedController);
-        controller_speedMotor.setFeedbackDevice(encoder_speedMotor); 
+        controller_speedMotor = speedMotor.getPIDController();
+        controller_speedMotor.setFeedbackDevice(encoder_speedMotor);
+        controller_speedMotor.setP(Constants.kp_speedController, 0);
+        controller_speedMotor.setI(Constants.ki_speedController, 0);
+        controller_speedMotor.setD(Constants.kd_speedController, 0);
+        controller_speedMotor.setFF(Constants.kf_speedController, 0);
+        controller_speedMotor.setIZone(Constants.kIz_speedController, 0);
+
+        steerMotor = new CANSparkMax(id_steerMotor, MotorType.kBrushless);
+        steerMotor.setSmartCurrentLimit(50);
+        speedMotor.setSmartCurrentLimit(50);
+        encoder_steerMotor = steerMotor.getEncoder();
+        encoder_steerMotor.setPositionConversionFactor(Constants.steerPositionCoefficient);
+        encoder_steerMotor.setVelocityConversionFactor(Constants.steerVelocityCoefficient);
+        controller_steerMotor = steerMotor.getPIDController();
+        controller_steerMotor.setFeedbackDevice(encoder_steerMotor);
+        controller_steerMotor.setP(Constants.kp_steerController, 0);
+        controller_steerMotor.setI(Constants.ki_steerController, 0);
+        controller_steerMotor.setD(Constants.kd_steerController, 0);
+        controller_steerMotor.setFF(Constants.kf_steerController, 0);
+        controller_steerMotor.setIZone(Constants.kIz_steerController, 0);
+        controller_steerMotor.setPositionPIDWrappingEnabled(true);
+        controller_steerMotor.setPositionPIDWrappingMinInput(0);
+        controller_steerMotor.setPositionPIDWrappingMaxInput(Math.PI * 2);
+        controller_steerMotor.setSmartMotionAllowedClosedLoopError(1, 0); 
+
+        cancoder_steerMotor = new CANCoder(id_steerCanCoder);
+        cancoder_steerMotor.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+        cancoder_steerMotor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
+        cancoder_steerMotor.configMagnetOffset(360 - steerOffset.getDegrees());
+
         outputTelemetry(); 
+        encoder_steerMotor.setPosition(getCanCoderAngle().getRadians());
+        setAngleCanCoderToPositionMotor();
+        encoder_speedMotor.setPosition(0);
     }
-
-    public void setCoastMode (){
-        var neutralMode = new MotorOutputConfigs();
-        neutralMode.NeutralMode = NeutralModeValue.Coast;
-        steerMotor.getConfigurator().apply(neutralMode);
-        speedMotor1.setIdleMode(IdleMode.kCoast);
-        speedMotor2.setIdleMode(IdleMode.kCoast);
-        isBrakeMode = false;
+    
+    public void voltageSpeedMotor (double output){
+        controller_speedMotor.setReference(output, CANSparkMax.ControlType.kDutyCycle);
     }
-
-    public void setBrakeMode (){
-        var neutralMode = new MotorOutputConfigs();
-        neutralMode.NeutralMode = NeutralModeValue.Brake;
-        steerMotor.getConfigurator().apply(neutralMode);
-        speedMotor1.setIdleMode(IdleMode.kBrake);
-        speedMotor2.setIdleMode(IdleMode.kBrake);
-        isBrakeMode = true;
+    
+    public void velocitySpeedMotor (double velocity){
+        controller_speedMotor.setReference(velocity, CANSparkMax.ControlType.kVelocity); 
     }
-
-    public Rotation2d getCanCoderAngle (){
-        return Rotation2d.fromRotations(cancoder.getAbsolutePosition().getValue());
+    
+    public double getVelocitySpeedMotor (){
+        return (encoder_speedMotor.getVelocity() * Constants.driveVelocityCoefficient);
     }
-
-    public void setAngleMotor (Rotation2d angle){
-        PositionTorqueCurrentFOC positionWithTorque = new PositionTorqueCurrentFOC(0, 0, 0, false);
-        steerMotor.setControl(positionWithTorque.withPosition(angle.getRotations()));
+    
+    public void setPositionSpeedMotor (double position){
+        encoder_speedMotor.setPosition(position);
     }
-
+    
     public double getPositionSpeedMotor (){
         return encoder_speedMotor.getPosition();
     }
 
-    public void setPositionSpeedMotor (double position){
-        encoder_speedMotor.setPosition(position);
+    public Rotation2d getCanCoderAngle (){
+        return Rotation2d.fromDegrees(cancoder_steerMotor.getAbsolutePosition());
     }
 
-    public double getVelocitySpeedMotor (){
-        return encoder_speedMotor.getVelocity();
+    public void setAngleCanCoderToPositionMotor (){
+        encoder_steerMotor.setPosition(getCanCoderAngle().getRadians());
     }
 
-    public void setVelocitySpeedMotor (double velocity){
-        controller_speedMotor.setReference(velocity, ControlType.kVelocity, 0, 0);
+    public Rotation2d getSteerMotorAngle (){
+        double adjustedAngle;
+        double moduleAngle = encoder_steerMotor.getPosition() % (Math.PI * 2);
+        if (Math.abs(moduleAngle) > 0){
+            adjustedAngle = moduleAngle;
+        }
+        else {
+            adjustedAngle = encoder_steerMotor.getPosition();
+        }
+        if (adjustedAngle < 0){
+            adjustedAngle += Math.PI * 2;
+        }
+        return Rotation2d.fromRadians(adjustedAngle);
     }
-
-    public void setVoltageSpeedMotor (double voltage){
-        controller_speedMotor.setReference(voltage, ControlType.kDutyCycle, 0, 0);
+    
+    public void angleSteerMotor (Rotation2d angle){
+        Rotation2d errorAngle = angle.minus(constraintAngle(getSteerMotorAngle()));
+        controller_steerMotor.setReference(encoder_steerMotor.getPosition() + errorAngle.getRadians(), CANSparkMax.ControlType.kPosition);
     }
-
+    
+    public Rotation2d constraintAngle (Rotation2d angle){
+        double angleRadians = angle.getRadians(); 
+        if (angleRadians > Math.PI){
+            angleRadians -= Math.PI * 2;
+        }
+        if (angleRadians < -Math.PI){
+            angleRadians += Math.PI * 2;
+        }
+        return Rotation2d.fromRadians(angleRadians);
+    }
+    
+    public void setModuleState (SwerveModuleState moduleState){
+        desiredState = SwerveModuleState.optimize(moduleState, getCanCoderAngle());
+        velocitySpeedMotor(desiredState.speedMetersPerSecond / Constants.maxDriveVel);
+        angleSteerMotor(desiredState.angle);
+    }
+    
     public SwerveModuleState getModuleState (){
-        return new SwerveModuleState(getVelocitySpeedMotor(), getCanCoderAngle());
+        return new SwerveModuleState(getVelocitySpeedMotor(), getSteerMotorAngle());
     }
 
-    public void setModuleStateWithVelocity (SwerveModuleState moduleState){
-        setAngleMotor(moduleState.angle);
-        setVelocitySpeedMotor(moduleState.speedMetersPerSecond);
+    public SwerveModuleState getDesiredModuleState (){
+        return desiredState;
     }
-
-    public void setModuleStateWithVoltage (SwerveModuleState moduleState){
-        setAngleMotor(moduleState.angle);
-        setVoltageSpeedMotor(moduleState.speedMetersPerSecond / Constants.maxDriveVel);
+    
+    public void setModulePosition (SwerveModulePosition swerveModulePosition){
+        angleSteerMotor(swerveModulePosition.angle);
+        encoder_speedMotor.setPosition(swerveModulePosition.distanceMeters);
     }
-
+    
     public SwerveModulePosition getModulePosition (){
-        return new SwerveModulePosition(getPositionSpeedMotor(), getCanCoderAngle());
+        return new SwerveModulePosition(getPositionSpeedMotor(), getSteerMotorAngle());
+    }
+
+    public void setBrakeMode (){
+        speedMotor.setIdleMode(IdleMode.kBrake);
+        steerMotor.setIdleMode(IdleMode.kBrake);
+        isBrakeMode = true;
+    }
+
+    public void setCoastMode (){
+        speedMotor.setIdleMode(IdleMode.kCoast);
+        steerMotor.setIdleMode(IdleMode.kCoast);
+        isBrakeMode = false; 
     }
 
     public void outputTelemetry (){
-        ShuffleboardLayout motorsData = tabMotorsData.getLayout("Module " + speedMotor1.getDeviceId() + "-" + steerMotor.getDeviceID(), BuiltInLayouts.kList).withSize(2, 3);
-        motorsData.addDouble("SpeedMotorPosition", () -> getPositionSpeedMotor());
-        motorsData.addDouble("SpeedMotorVelocity", () -> getVelocitySpeedMotor());
-        motorsData.addDouble("CanCoderAngle", () -> getCanCoderAngle().getRotations());
+        ShuffleboardLayout motorsData = tabSwerve.getLayout("Module " + speedMotor.getDeviceId() + "-" + steerMotor.getDeviceId(), BuiltInLayouts.kList).withSize(2, 3);
+        motorsData.addDouble("SpeedMotorPosition", () -> {return getPositionSpeedMotor();});
+        motorsData.addDouble("SpeedMotorVelocity", () -> {return getVelocitySpeedMotor();});
+        motorsData.addDouble("CanCoderAngle", () -> {return getCanCoderAngle().getDegrees();});
+        motorsData.addDouble("SteerMotorAngle", () -> {return getSteerMotorAngle().getDegrees();});
+        motorsData.addDouble("DS Velocity", ()->{return getDesiredModuleState().speedMetersPerSecond;});
+        motorsData.addDouble("DS Angle", ()->{return getDesiredModuleState().angle.getDegrees();});
+
     }
 }

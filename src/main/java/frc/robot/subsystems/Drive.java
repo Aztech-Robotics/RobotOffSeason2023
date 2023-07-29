@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,53 +25,50 @@ import frc.robot.swerve.SwerveModule;
 public class Drive extends SubsystemBase  {
   private static Drive drive;
   public static SwerveDriveKinematics swerveDriveKinematics = new SwerveDriveKinematics(
-    //FrontLeft
     new Translation2d(Constants.trackWidth/2, Constants.wheelBase/2),
-    //FrontRight
     new Translation2d(Constants.trackWidth/2, -Constants.wheelBase/2),
-    //RearLeft
     new Translation2d(-Constants.trackWidth/2, Constants.wheelBase/2),
-    //RearRight 
     new Translation2d(-Constants.trackWidth/2, -Constants.wheelBase/2)
   );
+  private SwerveModule[] modules = new SwerveModule[4];
+  private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
   private SwerveDrivePoseEstimator swerveDrivePoseEstimator = null;
   private ChassisSpeeds desiredChassisSpeeds = null;
   private SwerveMode swerveMode = SwerveMode.Nothing;
-  private SwerveModule[] modules = new SwerveModule[4];
-  private SwerveModuleState[] modules_states;
-  private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
   private ShuffleboardTab tabDrive = Shuffleboard.getTab("DriveData"); 
   private Limelight limelight = Limelight.getInstance(); 
   
   private Drive() {
     modules[0] = new SwerveModule(
+      Constants.id_speed_fLeft,
       Constants.id_steer_fLeft, 
       Constants.id_canCoder_fLeft, 
-      Constants.id_drive1_fLeft, 
-      Constants.id_drive2_fLeft, 
       Constants.offset_fLeft
     );
     modules[1] = new SwerveModule(
+      Constants.id_speed_fRight, 
       Constants.id_steer_fRight, 
       Constants.id_canCoder_fRight, 
-      Constants.id_drive1_fRight, 
-      Constants.id_drive2_fRight, 
       Constants.offset_fRight
     );
     modules[2] = new SwerveModule(
+      Constants.id_speed_bLeft, 
       Constants.id_steer_bLeft, 
       Constants.id_canCoder_bLeft, 
-      Constants.id_drive1_bLeft, 
-      Constants.id_drive2_bLeft, 
       Constants.offset_bLeft
     );
     modules[3] = new SwerveModule(
+      Constants.id_speed_bRight, 
       Constants.id_steer_bRight, 
       Constants.id_canCoder_bRight, 
-      Constants.id_drive1_bRight, 
-      Constants.id_drive2_bRight, 
       Constants.offset_bRight
     ); 
+    swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(swerveDriveKinematics, 
+    getGyroAngle(), 
+    getModulesPosition(), 
+    new Pose2d(), 
+    new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0), 
+    new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0));
     outputTelemetry();
   }
 
@@ -94,31 +93,23 @@ public class Drive extends SubsystemBase  {
           }
         }
       break; 
-
-      case OpenLoopWithVelocity:
+      case OpenLoop:
         if (desiredChassisSpeeds != null) {
-          modules_states = swerveDriveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
-          SwerveDriveKinematics.desaturateWheelSpeeds(modules_states, Constants.maxDriveVel);
-          setModulesStatesWithVelocity(modules_states);
+          SwerveModuleState[] modules_states = new SwerveModuleState[4]; 
+          if (desiredChassisSpeeds.vxMetersPerSecond == 0 && desiredChassisSpeeds.vyMetersPerSecond == 0 && desiredChassisSpeeds.omegaRadiansPerSecond == 0){
+            modules_states[0] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+            modules_states[1] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+            modules_states[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+            modules_states[3] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+          }
+          else {
+            modules_states = swerveDriveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
+            SwerveDriveKinematics.desaturateWheelSpeeds(modules_states, Constants.maxDriveVel);
+          }
+          setModulesStates(modules_states);
         }
         desiredChassisSpeeds = null;
-      break;
-
-      case OpenLoopWithVoltage:
-      SwerveModuleState[] moduleStatesArray;
-        if (desiredChassisSpeeds != null) {
-          moduleStatesArray = swerveDriveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
-          SwerveDriveKinematics.desaturateWheelSpeeds(moduleStatesArray, Constants.maxDriveVel);
-          setModulesStatesWithVoltage(moduleStatesArray);
-        }
-        desiredChassisSpeeds = null;
-      break;
-
-      case Trajectory:
         updateOdometry();
-      break;
-
-      case AutoBalance:
       break;
     }
   }
@@ -147,15 +138,9 @@ public class Drive extends SubsystemBase  {
     return swerveModulesStates;
   }
   
-  public void setModulesStatesWithVelocity (SwerveModuleState[] swerveModulesModuleStates){
+  public void setModulesStates (SwerveModuleState[] swerveModuleStates){
     for (int i=0; i < modules.length; i++){
-      modules[i].setModuleStateWithVelocity(SwerveModuleState.optimize(swerveModulesModuleStates[i], modules[i].getCanCoderAngle()));
-    }
-  }
-
-  public void setModulesStatesWithVoltage (SwerveModuleState[] swerveModulesModuleStates){
-    for (int i=0; i < modules.length; i++){
-      modules[i].setModuleStateWithVoltage(SwerveModuleState.optimize(swerveModulesModuleStates[i], modules[i].getCanCoderAngle()));
+      modules[i].setModuleState(swerveModuleStates[i]);
     }
   }
   
@@ -177,6 +162,18 @@ public class Drive extends SubsystemBase  {
   
   public void setDesiredChassisSpeeds (ChassisSpeeds chassisSpeeds){
     desiredChassisSpeeds = chassisSpeeds;
+    SwerveModuleState[] modules_states = new SwerveModuleState[4]; 
+    if (desiredChassisSpeeds.vxMetersPerSecond == 0 && desiredChassisSpeeds.vyMetersPerSecond == 0 && desiredChassisSpeeds.omegaRadiansPerSecond == 0){
+      modules_states[0] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+      modules_states[1] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+      modules_states[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+      modules_states[3] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+    }
+    else {
+      modules_states = swerveDriveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
+      SwerveDriveKinematics.desaturateWheelSpeeds(modules_states, Constants.maxDriveVel);
+    }
+    setModulesStates(modules_states);
   }
 
   public void resetChassisPosition (Pose2d initialPose){

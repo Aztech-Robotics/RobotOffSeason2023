@@ -68,9 +68,6 @@ public class Limelight {
       case RightDSubAprilTag:
       LimelightHelpers.setPipelineIndex(null, 3);
       break;
-      case GameElementDetection:
-      LimelightHelpers.setPipelineIndex(null, 4);
-      break;
     }
   }
 
