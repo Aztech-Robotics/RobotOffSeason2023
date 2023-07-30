@@ -15,6 +15,7 @@ import frc.robot.modes.GamePieceMode;
 import frc.robot.subsystems.Limelight;
 
 public class Telemetry {
+  public static ShuffleboardTab tabDrive = Shuffleboard.getTab("DriveData"); 
   public static ShuffleboardTab tabDriver = Shuffleboard.getTab("DriverTab"); 
   private GamePieceMode gamePieceMode = GamePieceMode.getInstance();
   private SendableChooser<Command> chooserAuto = new SendableChooser<>(); 

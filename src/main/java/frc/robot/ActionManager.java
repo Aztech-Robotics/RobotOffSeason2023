@@ -11,8 +11,7 @@ public class ActionManager {
     private ActionInterface sticky_action;
     private MechanismActionMode mechanismActionMode = MechanismActionMode.getInstance();
     private ScoreTop scoreTop = new ScoreTop();
-    private ActionManager (){
-    }
+    private ActionManager (){}
 
     public static ActionManager getInstance (){
         if (actionManager == null){

@@ -31,9 +31,9 @@ public class FieldOrientedDrive extends CommandBase {
   public void execute() {
     m_SwerveDrive.setDesiredChassisSpeeds(
       ChassisSpeeds.fromFieldRelativeSpeeds(
-        MathUtil.applyDeadband(translationXSupplier.getAsDouble(), 0.2) * Constants.maxDriveVel,
-        MathUtil.applyDeadband(translationYSupplier.getAsDouble(), 0.2) * Constants.maxDriveVel,
-        MathUtil.applyDeadband(rotationSupplier.getAsDouble(), 0.2) * Constants.maxAngVel,
+        MathUtil.applyDeadband(translationXSupplier.getAsDouble(), 0.2) * Constants.DriveTrain.maxDriveVel,
+        MathUtil.applyDeadband(translationYSupplier.getAsDouble(), 0.2) * Constants.DriveTrain.maxDriveVel,
+        MathUtil.applyDeadband(rotationSupplier.getAsDouble(), 0.2) * Constants.DriveTrain.maxAngVel,
         m_SwerveDrive.getGyroAngle()
       )
     );

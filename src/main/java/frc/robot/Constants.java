@@ -1,47 +1,55 @@
 package frc.robot;
 
+import java.util.Map;
+
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
-  public static final double trackWidth = Units.inchesToMeters(25);
-  public static final double wheelBase = Units.inchesToMeters(25);
-  public static final double wheelDiameter = 0.1;
-  public static final double max_rpm_neo = 5676;
-  public static final double drive_gear_ratio = 6.75;
-  public static final double steer_gear_ratio = 12.8;
+
+  public static class DriveTrain {
+    public static final double trackWidth = Units.inchesToMeters(25);
+    public static final double wheelBase = Units.inchesToMeters(25);
+    public static final double wheelDiameter = 0.1;
+    public static final double max_rpm_neo = 5676;
+    public static final double drive_gear_ratio = 6.75;
+    public static final double steer_gear_ratio = 12.8;
+    
+    public static final double maxDriveVel = ((max_rpm_neo / 60) / drive_gear_ratio) * Math.PI * wheelDiameter; 
+    public static final double maxSteerVel = ((max_rpm_neo / 60) / steer_gear_ratio) * Math.PI * wheelDiameter; 
+    public static final double maxAngVel = (maxDriveVel / (Math.PI * Math.hypot(trackWidth, wheelBase))) * 2 * Math.PI;   
   
-  public static final double maxDriveVel = ((max_rpm_neo / 60) / drive_gear_ratio) * Math.PI * wheelDiameter; 
-  public static final double maxSteerVel = ((max_rpm_neo / 60) / steer_gear_ratio) * Math.PI * wheelDiameter; 
-  public static final double maxAngVel = (maxDriveVel / (Math.PI * Math.hypot(trackWidth, wheelBase))) * 2 * Math.PI;   
+    public static final double drivePositionCoefficient = (Math.PI * wheelDiameter) / drive_gear_ratio;
+    public static final double driveVelocityCoefficient = drivePositionCoefficient / 60;
+    public static final double steerPositionCoefficient = (Math.PI * 2) / steer_gear_ratio;
+    public static final double steerVelocityCoefficient = steerPositionCoefficient / 60; 
+  
+    public static final int id_speed_fLeft = 1;
+    public static final int id_steer_fLeft = 2;
+    public static final int id_canCoder_fLeft = 3;
+    public static final Rotation2d offset_fLeft = Rotation2d.fromDegrees(0);
+  
+    public static final int id_speed_fRight = 5;
+    public static final int id_steer_fRight = 6;
+    public static final int id_canCoder_fRight = 7;
+    public static final Rotation2d offset_fRight = Rotation2d.fromDegrees(0);
+  
+    public static final int id_speed_bLeft = 9;
+    public static final int id_steer_bLeft = 10;
+    public static final int id_canCoder_bLeft = 11;
+    public static final Rotation2d offset_bLeft = Rotation2d.fromDegrees(0);
+  
+    public static final int id_speed_bRight = 13;
+    public static final int id_steer_bRight = 14;
+    public static final int id_canCoder_bRight = 15;
+    public static final Rotation2d offset_bRight = Rotation2d.fromDegrees(0); 
+  
+  }
 
-  public static final double drivePositionCoefficient = (Math.PI * wheelDiameter) / drive_gear_ratio;
-  public static final double driveVelocityCoefficient = drivePositionCoefficient / 60;
-  public static final double steerPositionCoefficient = (Math.PI * 2) / steer_gear_ratio;
-  public static final double steerVelocityCoefficient = steerPositionCoefficient / 60; 
-
-  public static final int id_speed_fLeft = 1;
-  public static final int id_steer_fLeft = 2;
-  public static final int id_canCoder_fLeft = 3;
-  public static final Rotation2d offset_fLeft = Rotation2d.fromDegrees(0);
-
-  public static final int id_speed_fRight = 5;
-  public static final int id_steer_fRight = 6;
-  public static final int id_canCoder_fRight = 7;
-  public static final Rotation2d offset_fRight = Rotation2d.fromDegrees(0);
-
-  public static final int id_speed_bLeft = 9;
-  public static final int id_steer_bLeft = 10;
-  public static final int id_canCoder_bLeft = 11;
-  public static final Rotation2d offset_bLeft = Rotation2d.fromDegrees(0);
-
-  public static final int id_speed_bRight = 13;
-  public static final int id_steer_bRight = 14;
-  public static final int id_canCoder_bRight = 15;
-  public static final Rotation2d offset_bRight = Rotation2d.fromDegrees(0); 
   
   public static final int id_arm_master = 17;
   public static final int id_arm_sleeve = 18;
@@ -77,10 +85,32 @@ public final class Constants {
   public static final PathPlannerTrajectory pickUp3rdPiece = PathPlanner.loadPath("PickUp3rdPiece", 4, 3.8);
   public static final PathPlannerTrajectory parking = PathPlanner.loadPath("Parking", 4, 3.8);
 
+  public static class FieldLayout {
+    public static final double kFieldLength = Units.inchesToMeters(651.25);
+    public static final double kFieldWidth = Units.inchesToMeters(315.5);
+    public static final double kTapeWidth = Units.inchesToMeters(2.0);
+    public static final Map<Integer, Pose2d> aprilTags = Map.of(
+      1, new Pose2d(0, 0, null),
+      2, new Pose2d(0, 0, null),
+      3, new Pose2d(0, 0, null),
+      4, new Pose2d(0, 0, null),
+      5, new Pose2d(0, 0, null), 
+      6, new Pose2d(0, 0, null),
+      7, new Pose2d(0, 0, null),
+      8, new Pose2d(0, 0, null)
+    );
+  }
+
 
   public static enum SwerveMode {
-    Nothing,
     OpenLoop,
+    Nothing
+  }
+
+  public static enum SwerveSubMode {
+    Trajectory,
+    AutoBalance,
+    Nothing
   }
 
   public static enum GameElement {

@@ -34,7 +34,7 @@ public class SwerveModule {
     public SwerveModule (int id_speedMotor, int id_steerMotor, int id_steerCanCoder, Rotation2d steerOffset){
         speedMotor = new CANSparkMax(id_speedMotor, MotorType.kBrushless);
         encoder_speedMotor = speedMotor.getEncoder();
-        encoder_speedMotor.setPositionConversionFactor(Constants.drivePositionCoefficient);
+        encoder_speedMotor.setPositionConversionFactor(Constants.DriveTrain.drivePositionCoefficient);
         controller_speedMotor = speedMotor.getPIDController();
         controller_speedMotor.setFeedbackDevice(encoder_speedMotor);
         controller_speedMotor.setP(Constants.kp_speedController, 0);
@@ -47,8 +47,8 @@ public class SwerveModule {
         steerMotor.setSmartCurrentLimit(50);
         speedMotor.setSmartCurrentLimit(50);
         encoder_steerMotor = steerMotor.getEncoder();
-        encoder_steerMotor.setPositionConversionFactor(Constants.steerPositionCoefficient);
-        encoder_steerMotor.setVelocityConversionFactor(Constants.steerVelocityCoefficient);
+        encoder_steerMotor.setPositionConversionFactor(Constants.DriveTrain.steerPositionCoefficient);
+        encoder_steerMotor.setVelocityConversionFactor(Constants.DriveTrain.steerVelocityCoefficient);
         controller_steerMotor = steerMotor.getPIDController();
         controller_steerMotor.setFeedbackDevice(encoder_steerMotor);
         controller_steerMotor.setP(Constants.kp_steerController, 0);
@@ -81,7 +81,7 @@ public class SwerveModule {
     }
     
     public double getVelocitySpeedMotor (){
-        return (encoder_speedMotor.getVelocity() * Constants.driveVelocityCoefficient);
+        return (encoder_speedMotor.getVelocity() * Constants.DriveTrain.driveVelocityCoefficient);
     }
     
     public void setPositionSpeedMotor (double position){
@@ -133,7 +133,7 @@ public class SwerveModule {
     
     public void setModuleState (SwerveModuleState moduleState){
         desiredState = SwerveModuleState.optimize(moduleState, getCanCoderAngle());
-        velocitySpeedMotor(desiredState.speedMetersPerSecond / Constants.maxDriveVel);
+        velocitySpeedMotor(desiredState.speedMetersPerSecond / Constants.DriveTrain.maxDriveVel);
         angleSteerMotor(desiredState.angle);
     }
     
