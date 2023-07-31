@@ -2,9 +2,6 @@ package frc.robot;
 
 import java.util.Map;
 
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -47,7 +44,18 @@ public final class Constants {
     public static final int id_steer_bRight = 14;
     public static final int id_canCoder_bRight = 15;
     public static final Rotation2d offset_bRight = Rotation2d.fromDegrees(0); 
+
+    public static final double kp_steerController = 0.8;
+    public static final double ki_steerController = 0.0;
+    public static final double kd_steerController = 1;
+    public static final double kf_steerController = 0.0;
+    public static final double kIz_steerController = 0.0;
   
+    public static final double kp_speedController = 0.0004;
+    public static final double ki_speedController = 0.00002;
+    public static final double kd_speedController = 0.0;
+    public static final double kf_speedController = 0.0;
+    public static final double kIz_speedController = 0.0;
   }
 
   
@@ -68,23 +76,6 @@ public final class Constants {
 
   public static final int id_intake = 23;
 
-  public static final double kp_steerController = 0.8;
-  public static final double ki_steerController = 0.0;
-  public static final double kd_steerController = 1;
-  public static final double kf_steerController = 0.0;
-  public static final double kIz_steerController = 0.0;
-
-  public static final double kp_speedController = 0.0004;
-  public static final double ki_speedController = 0.00002;
-  public static final double kd_speedController = 0.0;
-  public static final double kf_speedController = 0.0;
-  public static final double kIz_speedController = 0.0;
-
-  public static final PathPlannerTrajectory pickUp2ndPiece = PathPlanner.loadPath("PickUp2ndPiece", 4, 3.8);
-  public static final PathPlannerTrajectory drop2ndPiece = PathPlanner.loadPath("Drop2ndPiece", 4, 3.8);
-  public static final PathPlannerTrajectory pickUp3rdPiece = PathPlanner.loadPath("PickUp3rdPiece", 4, 3.8);
-  public static final PathPlannerTrajectory parking = PathPlanner.loadPath("Parking", 4, 3.8);
-
   public static class FieldLayout {
     public static final double kFieldLength = Units.inchesToMeters(651.25);
     public static final double kFieldWidth = Units.inchesToMeters(315.5);
@@ -101,6 +92,10 @@ public final class Constants {
     );
   }
 
+  public static class Auto {
+    public static final String pathPickUp2ndPiece = "paths/PickUp2ndPiece.path";
+    public static final String pathDrop2ndPiece = "paths/Drop2ndPiece.path";
+  }
 
   public static enum SwerveMode {
     OpenLoop,

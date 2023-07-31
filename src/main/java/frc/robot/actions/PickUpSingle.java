@@ -1,8 +1,25 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.actions;
 
-/** Add your docs here. */
-public class PickUpSingle {}
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.interfaces.ActionClass;
+import frc.robot.interfaces.ActionInterface;
+
+public class PickUpSingle extends ActionClass implements ActionInterface {
+    public PickUpSingle (){
+    }
+
+    @Override
+    public Command getActionCommand (){
+        return super.selectActionCommand(this);
+    }
+
+    @Override
+    public Command actionForCone (){
+        return null;
+    }
+
+    @Override
+    public Command actionForCube (){
+        return null;
+    }
+}

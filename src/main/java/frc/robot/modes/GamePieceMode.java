@@ -1,7 +1,5 @@
 package frc.robot.modes;
 
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Telemetry;
 import frc.robot.Constants.GameElement;

@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private RobotContainer robotContainer;
   private Command m_autonomousCommand;
+  
   public static boolean flip_alliance (){
     return DriverStation.getAlliance() == Alliance.Red ? true : false;
   }

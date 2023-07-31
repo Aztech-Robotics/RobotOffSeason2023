@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
@@ -108,6 +106,8 @@ public class Drive extends SubsystemBase  {
           desiredChassisSpeeds = motionPlanner.update(getCurrentPose(), Timer.getFPGATimestamp()); 
           break;
           case AutoBalance:
+          break;
+          case Nothing:
           break;
         }
         if (desiredChassisSpeeds != null) {
