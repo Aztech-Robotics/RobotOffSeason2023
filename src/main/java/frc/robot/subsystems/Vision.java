@@ -4,15 +4,15 @@ import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.Constants.TypePipeline;
 import frc.robot.utils.LimelightHelpers;
 
-public class Limelight {
-  private static Limelight limelight;
+public class Vision {
+  private static Vision limelight;
   private TypePipeline activePipeline;
 
-  private Limelight() {}
+  private Vision() {}
 
-  public static Limelight getInstance (){
+  public static Vision getInstance (){
     if (limelight == null){
-      limelight = new Limelight();
+      limelight = new Vision();
     }
     return limelight;
   }
@@ -27,6 +27,10 @@ public class Limelight {
 
   public boolean sawTag (){
     return getTagID() != -1? true : false; 
+  }
+
+  public Pose2d getBotPose (){
+    return LimelightHelpers.getBotPose2d(null);
   }
 
   public Pose2d getBotPoseBlueAlliance (){

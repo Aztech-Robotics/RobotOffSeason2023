@@ -80,16 +80,66 @@ public final class Constants {
     public static final double kFieldLength = Units.inchesToMeters(651.25);
     public static final double kFieldWidth = Units.inchesToMeters(315.5);
     public static final double kTapeWidth = Units.inchesToMeters(2.0);
-    public static final Map<Integer, Pose2d> aprilTags = Map.of(
-      1, new Pose2d(0, 0, null),
-      2, new Pose2d(0, 0, null),
-      3, new Pose2d(0, 0, null),
-      4, new Pose2d(0, 0, null),
-      5, new Pose2d(0, 0, null), 
-      6, new Pose2d(0, 0, null),
-      7, new Pose2d(0, 0, null),
-      8, new Pose2d(0, 0, null)
-    );
+
+    public static class blueGridPoses {
+      public static final Map<Integer, Pose2d> map = Map.of(
+        1, new Pose2d(0, 0, null),
+        2, new Pose2d(0, 0, null),
+        3, new Pose2d(0, 0, null),
+        4, new Pose2d(0, 0, null),
+        5, new Pose2d(0, 0, null), 
+        6, new Pose2d(0, 0, null),
+        7, new Pose2d(0, 0, null),
+        8, new Pose2d(0, 0, null),
+        9, new Pose2d(0, 0, null)
+      );
+
+      public static Pose2d getPose (int node){
+        return map.get(node);
+      }
+    }
+
+    public static class blueStationPoses {
+      public static final Map<Integer, Pose2d> map = Map.of(
+        1, new Pose2d(0, 0, null),
+        2, new Pose2d(0, 0, null),
+        3, new Pose2d(0, 0, null)
+      );
+
+      public static Pose2d getPose (int station){
+        return map.get(station);
+      }
+    }
+
+    public static class redGridPoses {
+      public static final Map<Integer, Pose2d> map = Map.of(
+        1, new Pose2d(0, 0, null),
+        2, new Pose2d(0, 0, null),
+        3, new Pose2d(0, 0, null),
+        4, new Pose2d(0, 0, null),
+        5, new Pose2d(0, 0, null), 
+        6, new Pose2d(0, 0, null),
+        7, new Pose2d(0, 0, null),
+        8, new Pose2d(0, 0, null),
+        9, new Pose2d(0, 0, null)
+      );
+
+      public static Pose2d getPose (int node){
+        return map.get(node);
+      }
+    }
+
+    public static class redStationPoses {
+      public static final Map<Integer, Pose2d> map = Map.of(
+        1, new Pose2d(0, 0, null),
+        2, new Pose2d(0, 0, null),
+        3, new Pose2d(0, 0, null)
+      );
+
+      public static Pose2d getPose (int station){
+        return map.get(station);
+      }
+    }
   }
 
   public static class Auto {

@@ -12,9 +12,10 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.autos.AutoSample;
 import frc.robot.interfaces.AutoInterface;
 import frc.robot.modes.GamePieceMode;
-import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.Vision;
 
 public class Telemetry {
+  private static Telemetry telemetry;
   public static ShuffleboardTab tabDrive = Shuffleboard.getTab("DriveData"); 
   public static ShuffleboardTab tabDriver = Shuffleboard.getTab("DriverTab"); 
   private GamePieceMode gamePieceMode = GamePieceMode.getInstance();
@@ -25,7 +26,7 @@ public class Telemetry {
   private int [] activeNode = new int[2]; 
   private int activeStation = 0;
   
-  public Telemetry() {
+  private Telemetry() {
     tabDriver.getComponents().clear(); 
     displayCamera();
     displayGrid();
@@ -34,8 +35,15 @@ public class Telemetry {
     activeGamePieceMode();
   }
 
+  public static Telemetry getInstance (){
+    if (telemetry == null){
+      telemetry = new Telemetry();
+    }
+    return telemetry;
+  }
+
   private void displayCamera (){
-    tabDriver.addCamera("Limelight", "limelight", Limelight.getInstance().getURL())
+    tabDriver.addCamera("Limelight", "limelight", Vision.getInstance().getURL())
     .withSize(4, 4)
     .withPosition(0, 0);
   }
@@ -57,9 +65,9 @@ public class Telemetry {
           array_grid[i][j] = false;
         }
         if (i%2 == 0){
-          grid.addBoolean("("+i+","+j+")", ()-> getNodeValue(i_copy, j_copy)).withPosition(8-i, 2-i).withProperties(Map.of("Color when true","#00ff00","Color when false","#ffff00")); 
+          grid.addBoolean("("+i+","+j+")", ()-> getNodeValue(i_copy, j_copy)).withPosition(i, i).withProperties(Map.of("Color when true","#00ff00","Color when false","#ffff00")); 
         } else {
-          grid.addBoolean("("+i+","+j+")", ()-> getNodeValue(i_copy, j_copy)).withPosition(8-i, 2-i).withProperties(Map.of("Color when true","#00ff00","Color when false","#8066cc")); 
+          grid.addBoolean("("+i+","+j+")", ()-> getNodeValue(i_copy, j_copy)).withPosition(i, i).withProperties(Map.of("Color when true","#00ff00","Color when false","#8066cc")); 
         }
       }
     }
@@ -82,8 +90,12 @@ public class Telemetry {
     }
   }
 
-  public int[] getActiveNode (){
-    return activeNode;
+  public int getNode (){
+    return activeNode[0] + 1;
+  }
+
+  public int getNodeLevel (){
+    return activeNode[1] + 1; 
   }
 
   private void displayStations (){
@@ -105,13 +117,13 @@ public class Telemetry {
         selected_name = "Floor";
         break;
         case 1:
-        selected_name = "Left";
+        selected_name = "Single";
         break;
         case 2:
-        selected_name = "Right";
+        selected_name = "Left";
         break;
         case 3:
-        selected_name = "Single";
+        selected_name = "Right";
         break; 
       }
       stations.addBoolean(selected_name, ()-> getStationValue(i_copy));
@@ -132,7 +144,7 @@ public class Telemetry {
     }
   }
 
-  public int getActiveStationPosition (){
+  public int getActiveStation (){
     return activeStation;
   }
 

@@ -12,16 +12,16 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Telemetry;
+import frc.robot.Constants.MechanismMode;
 import frc.robot.Constants.SwerveMode;
 import frc.robot.Constants.SwerveSubMode;
+import frc.robot.modes.MechanismActionMode;
 import frc.robot.swerve.DriveMotionPlanner;
 import frc.robot.swerve.SwerveModule;
 
@@ -35,13 +35,16 @@ public class Drive extends SubsystemBase  {
   );
   private SwerveModule[] modules = new SwerveModule[4];
   private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
-  private Limelight limelight = Limelight.getInstance();
-  private SwerveMode swerveMode = SwerveMode.Nothing;
+  private Vision vision = Vision.getInstance();
   private SwerveDrivePoseEstimator swerveDrivePoseEstimator;
   private DriveMotionPlanner motionPlanner;
   private ChassisSpeeds desiredChassisSpeeds;
-  private SwerveSubMode swerveSubMode;
+  private SwerveMode swerveMode = SwerveMode.Nothing;
+  private SwerveSubMode swerveSubMode = SwerveSubMode.Nothing;
   private boolean odometryReseted = false; 
+  private boolean tagSearchActive = false;
+  private boolean readyForCorrectionPose = false;
+  private boolean tagMatch = false;
   
   private Drive() {
     modules[0] = new SwerveModule(
@@ -101,9 +104,10 @@ public class Drive extends SubsystemBase  {
         }
       break; 
       case OpenLoop:
+        double now = Timer.getFPGATimestamp();
         switch (swerveSubMode){
           case Trajectory:
-          desiredChassisSpeeds = motionPlanner.update(getCurrentPose(), Timer.getFPGATimestamp()); 
+          desiredChassisSpeeds = motionPlanner.update(getCurrentPose(), now); 
           break;
           case AutoBalance:
           break;
@@ -126,6 +130,9 @@ public class Drive extends SubsystemBase  {
         }
         desiredChassisSpeeds = null;
         updateOdometry();
+        if (tagSearchActive){
+          readyForCorrectionPose = tagMatch;
+        }
       break;
     }
   }
@@ -207,20 +214,25 @@ public class Drive extends SubsystemBase  {
   }
   
   public void updateOdometry (){
-    if (limelight.sawTag()){
-      if (Robot.flip_alliance()){
+    if (vision.sawTag()){
+      if (tagSearchActive){
+        MechanismMode mode = MechanismActionMode.getInstance().getMode();
+        tagMatch = false;
+        if (Robot.flip_alliance()){
+          if (mode == MechanismMode.Score){
+            tagMatch = vision.getTagID() == 1 || vision.getTagID() == 2 || vision.getTagID() == 3;
+          } else if (mode == MechanismMode.PickUp){
+            tagMatch = vision.getTagID() == 5;
+          }
+        } else {
+          if (mode == MechanismMode.Score){
+            tagMatch = vision.getTagID() == 6 || vision.getTagID() == 7 || vision.getTagID() == 8;
+          } else if (mode == MechanismMode.PickUp){
+            tagMatch = vision.getTagID() == 4;
+          }
+        }
       }
-      Alliance alliance = DriverStation.getAlliance();
-      switch (alliance){
-        case Blue:
-          swerveDrivePoseEstimator.addVisionMeasurement(limelight.getBotPoseBlueAlliance(), Timer.getFPGATimestamp() - (limelight.getLatencyPipeline()/1000.0) - (limelight.getLatencyCapture()/1000.0));
-        break;
-        case Red:
-          swerveDrivePoseEstimator.addVisionMeasurement(limelight.getBotPoseRedAlliance(), Timer.getFPGATimestamp() - (limelight.getLatencyPipeline()/1000.0) - (limelight.getLatencyCapture()/1000.0));
-        break;
-        case Invalid:
-        break;
-      }
+      swerveDrivePoseEstimator.addVisionMeasurement(vision.getBotPose(), Timer.getFPGATimestamp() - (vision.getLatencyPipeline()/1000.0) - (vision.getLatencyCapture()/1000.0));
     } else {
       swerveDrivePoseEstimator.update(getGyroAngle(), getModulesPosition());
     }
@@ -239,10 +251,26 @@ public class Drive extends SubsystemBase  {
     return swerveSubMode == SwerveSubMode.Trajectory && motionPlanner.isTrajectoryFinished();
   }
 
+  public void toggleTagSearch (){
+    tagSearchActive = !tagSearchActive;
+    readyForCorrectionPose = false; 
+  }
+
+  public boolean isTagSearchActive (){
+    return tagSearchActive;
+  }
+
+  public boolean isReadyForCorrectionPose (){
+    if (readyForCorrectionPose){
+      tagSearchActive = false;
+    }
+    return readyForCorrectionPose; 
+  }
+
   public void outputTelemetry (){
     Telemetry.tabDrive.addDouble("X Pose Odometry", ()->{return getCurrentPose().getX();}).withPosition(8, 0);
     Telemetry.tabDrive.addDouble("Y Pose Odometry", ()->{return getCurrentPose().getY();}).withPosition(9, 0);
     Telemetry.tabDrive.addDouble("GyroAngle", ()->{return getGyroAngle().getDegrees();}).withPosition(8, 1); 
-    Telemetry.tabDrive.addDouble("TAG ID", ()->{return limelight.getTagID();}).withPosition(9, 1);
+    Telemetry.tabDrive.addDouble("TAG ID", ()->{return vision.getTagID();}).withPosition(9, 1);
   }
 }

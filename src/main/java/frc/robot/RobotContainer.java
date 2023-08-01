@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.event.BooleanEvent;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
@@ -15,10 +17,11 @@ public class RobotContainer {
     private Telemetry telemetry;
     
     public RobotContainer (){
-        telemetry = new Telemetry();
+        telemetry = Telemetry.getInstance();
     }
 
-    public void modeBindings (){
+    public void modeBindings (EventLoop loop){
+        BooleanEvent launch_action = new BooleanEvent(loop, null);
     }
 
     public void controlBindings (){
@@ -64,6 +67,7 @@ public class RobotContainer {
         );
         Controls.movingLeftJD2().whileTrue(new RepeatCommand(new SequentialCommandGroup(moveActiveBox, new WaitCommand(0.3))));
         Controls.getRBumperD2().toggleOnTrue(moveActiveBox2);
+        
     }
 
     public Command getAutonomousCommand (){

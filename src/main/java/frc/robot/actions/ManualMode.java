@@ -4,8 +4,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.interfaces.ActionClass;
 import frc.robot.interfaces.ActionInterface;
 
-public class SaveMechanism extends ActionClass implements ActionInterface{
-    public SaveMechanism (){
+public class ManualMode extends ActionClass implements ActionInterface {
+    public ManualMode (){
     }
 
     @Override
@@ -15,7 +15,7 @@ public class SaveMechanism extends ActionClass implements ActionInterface{
 
     @Override
     public Command actionForCone (){
-        return null; 
+        return null;
     }
 
     @Override

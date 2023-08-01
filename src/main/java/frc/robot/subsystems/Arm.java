@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -19,6 +20,7 @@ public class Arm extends SubsystemBase {
   private SparkMaxPIDController pid_controller = arm_master.getPIDController();
   private SparkMaxLimitSwitch limit_reverse = arm_master.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);
   private CANSparkMax arm_sleeve = new CANSparkMax(Constants.id_arm_sleeve, MotorType.kBrushless);
+  private ArmFeedforward feedforward = new ArmFeedforward(0, 0, 0);
   private double desiredPosition = 0;
   private Arm() {
     arm_master.enableVoltageCompensation(12);
@@ -52,7 +54,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void setAngle (Rotation2d angle){
-
+    
   }
 
   public boolean isAtTargetPosition () {
