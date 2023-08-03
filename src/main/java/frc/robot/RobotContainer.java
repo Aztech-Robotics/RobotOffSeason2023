@@ -21,7 +21,6 @@ public class RobotContainer {
     }
 
     public void modeBindings (EventLoop loop){
-        BooleanEvent launch_action = new BooleanEvent(loop, null);
     }
 
     public void controlBindings (){

@@ -2,8 +2,8 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class WristVelocity extends CommandBase {
-  public WristVelocity() {
+public class ChaseTarget extends CommandBase {
+  public ChaseTarget() {
   }
 
   @Override

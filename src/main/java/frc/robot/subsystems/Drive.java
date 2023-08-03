@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import com.fasterxml.jackson.databind.AnnotationIntrospector.ReferenceProperty.Type;
-
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
@@ -127,8 +125,8 @@ public class Drive extends SubsystemBase  {
           SwerveModuleState[] modules_states = new SwerveModuleState[4]; 
           if (orientModulesOnZero && desiredChassisSpeeds.vxMetersPerSecond == 0 && desiredChassisSpeeds.vyMetersPerSecond == 0 && desiredChassisSpeeds.omegaRadiansPerSecond == 0){
             modules_states[0] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
-            modules_states[1] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
-            modules_states[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+            modules_states[1] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
+            modules_states[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
             modules_states[3] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
           }
           else {
@@ -288,6 +286,7 @@ public class Drive extends SubsystemBase  {
   private Double starter_time = Double.NaN;
   private PIDController pitch_controller = new PIDController(0, 0, 0);
   private Debouncer angle_debouncer = new Debouncer(0.5, DebounceType.kBoth);
+  private boolean autoBalanceIsDone = false;
 
   public void initAutoBalance (boolean isBackward){
     autoB_stage = AutoBalanceStages.BreakTheResistance; 
@@ -298,6 +297,9 @@ public class Drive extends SubsystemBase  {
     pitch_controller.setSetpoint(0.0);
     pitch_controller.setTolerance(0.2);
     pitch_controller.reset(); 
+    setSubMode(SwerveSubMode.AutoBalance);
+    autoBalanceIsDone = false;
+    orientModules();
   }
 
   public ChassisSpeeds updateAutoBalance (double current_time){
@@ -337,10 +339,20 @@ public class Drive extends SubsystemBase  {
       boolean outOfTolerance = angle_debouncer.calculate(!pitch_controller.atSetpoint());
       if (outOfTolerance){
         output = new ChassisSpeeds(0, pitch_controller.calculate(getPitchAngle().getDegrees()), 0); 
+      } else {
+        autoBalanceIsDone = true;
       }
       break;
     }
     return output;
+  }
+
+  public boolean autoBIsDone (){
+    return autoBalanceIsDone;
+  }
+
+  public void orientModules (){
+    orientModulesOnZero = true;
   }
 
   public void outputTelemetry (){
