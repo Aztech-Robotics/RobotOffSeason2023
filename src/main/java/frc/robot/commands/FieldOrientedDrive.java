@@ -34,7 +34,7 @@ public class FieldOrientedDrive extends CommandBase {
         MathUtil.applyDeadband(translationXSupplier.getAsDouble(), 0.2) * Constants.DriveTrain.maxDriveVel,
         MathUtil.applyDeadband(translationYSupplier.getAsDouble(), 0.2) * Constants.DriveTrain.maxDriveVel,
         MathUtil.applyDeadband(rotationSupplier.getAsDouble(), 0.2) * Constants.DriveTrain.maxAngVel,
-        m_SwerveDrive.getGyroAngle()
+        m_SwerveDrive.getYawAngle()
       )
     );
   }

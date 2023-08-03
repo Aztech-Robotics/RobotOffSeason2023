@@ -60,17 +60,23 @@ public class Vision {
   public void setPipeline(TypePipeline pipeline){
     activePipeline = pipeline;
     switch (pipeline){
-      case RetroflectiveTape:
+      case AllTags:
       LimelightHelpers.setPipelineIndex(null, 0);
       break;
-      case GridsAprilTags:
+      case RedGridTags:
       LimelightHelpers.setPipelineIndex(null, 1);
       break;
-      case LeftDSubAprilTag:
+      case BlueStationTag:
       LimelightHelpers.setPipelineIndex(null, 2);
       break;
-      case RightDSubAprilTag:
+      case RedStationTag:
       LimelightHelpers.setPipelineIndex(null, 3);
+      break;
+      case BlueGridTags:
+      LimelightHelpers.setPipelineIndex(null, 4);
+      break;
+      case RetroflectiveTape:
+      LimelightHelpers.setPipelineIndex(null, 5);
       break;
     }
   }

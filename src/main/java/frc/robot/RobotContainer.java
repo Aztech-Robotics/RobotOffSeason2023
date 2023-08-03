@@ -67,7 +67,6 @@ public class RobotContainer {
         );
         Controls.movingLeftJD2().whileTrue(new RepeatCommand(new SequentialCommandGroup(moveActiveBox, new WaitCommand(0.3))));
         Controls.getRBumperD2().toggleOnTrue(moveActiveBox2);
-        
     }
 
     public Command getAutonomousCommand (){

@@ -89,6 +89,7 @@ public class ActionManager {
                 int station = telemetry.getActiveStation();
                 if (drive.isTagSearchActive() && drive.isReadyForCorrectionPose() && station != 0){
                     driveCommand = trajectoryOnTheFly.getStationActionCommand(station);
+                    drive.toggleTagSearch();
                 }
                 switch (station){
                     case 0:
@@ -113,6 +114,7 @@ public class ActionManager {
                 int node = telemetry.getNode();
                 if (drive.isTagSearchActive() && drive.isReadyForCorrectionPose()){
                     driveCommand = trajectoryOnTheFly.getGridActionCommand(node);
+                    drive.toggleTagSearch();
                 }
                 switch (level){
                     case 3:
@@ -148,8 +150,6 @@ public class ActionManager {
             return new InstantCommand();
         }
     }
-
-    public void stopMechanismAction (){}
 
     public Command requestPISearching (){
         return new InstantCommand(() -> {drive.toggleTagSearch();});

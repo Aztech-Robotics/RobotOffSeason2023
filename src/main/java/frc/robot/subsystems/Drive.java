@@ -1,8 +1,13 @@
 package frc.robot.subsystems;
 
+import com.fasterxml.jackson.databind.AnnotationIntrospector.ReferenceProperty.Type;
+
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -18,9 +23,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Telemetry;
+import frc.robot.Constants.AutoBalanceStages;
 import frc.robot.Constants.MechanismMode;
 import frc.robot.Constants.SwerveMode;
 import frc.robot.Constants.SwerveSubMode;
+import frc.robot.Constants.TypePipeline;
 import frc.robot.modes.MechanismActionMode;
 import frc.robot.swerve.DriveMotionPlanner;
 import frc.robot.swerve.SwerveModule;
@@ -41,10 +48,11 @@ public class Drive extends SubsystemBase  {
   private ChassisSpeeds desiredChassisSpeeds;
   private SwerveMode swerveMode = SwerveMode.Nothing;
   private SwerveSubMode swerveSubMode = SwerveSubMode.Nothing;
+  private AutoBalanceStages autoB_stage;
   private boolean odometryReseted = false; 
   private boolean tagSearchActive = false;
   private boolean readyForCorrectionPose = false;
-  private boolean tagMatch = false;
+  private boolean orientModulesOnZero = false;
   
   private Drive() {
     modules[0] = new SwerveModule(
@@ -72,7 +80,7 @@ public class Drive extends SubsystemBase  {
       Constants.DriveTrain.offset_bRight
     ); 
     swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(swerveDriveKinematics, 
-    getGyroAngle(), 
+    getYawAngle(), 
     getModulesPosition(), 
     new Pose2d(), 
     new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0), 
@@ -110,13 +118,14 @@ public class Drive extends SubsystemBase  {
           desiredChassisSpeeds = motionPlanner.update(getCurrentPose(), now); 
           break;
           case AutoBalance:
+          desiredChassisSpeeds = updateAutoBalance(now);
           break;
           case Nothing:
           break;
         }
         if (desiredChassisSpeeds != null) {
           SwerveModuleState[] modules_states = new SwerveModuleState[4]; 
-          if (desiredChassisSpeeds.vxMetersPerSecond == 0 && desiredChassisSpeeds.vyMetersPerSecond == 0 && desiredChassisSpeeds.omegaRadiansPerSecond == 0){
+          if (orientModulesOnZero && desiredChassisSpeeds.vxMetersPerSecond == 0 && desiredChassisSpeeds.vyMetersPerSecond == 0 && desiredChassisSpeeds.omegaRadiansPerSecond == 0){
             modules_states[0] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
             modules_states[1] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
             modules_states[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
@@ -130,9 +139,6 @@ public class Drive extends SubsystemBase  {
         }
         desiredChassisSpeeds = null;
         updateOdometry();
-        if (tagSearchActive){
-          readyForCorrectionPose = tagMatch;
-        }
       break;
     }
   }
@@ -179,12 +185,35 @@ public class Drive extends SubsystemBase  {
     return modulesPosition;
   }
   
+  public void resetYawAngle (){
+    gyro.reset();
+  }
+  
+  public Rotation2d getYawAngle (){
+    return Rotation2d.fromDegrees(Math.IEEEremainder(-gyro.getAngle(), 360));
+  }
+
+  public void resetPitchAngle (){
+  }
+  
+  public Rotation2d getPitchAngle (){
+    return null;
+  }
+  
   public Pose2d getCurrentPose (){
     return swerveDrivePoseEstimator.getEstimatedPosition();
   }
   
   public void setCurrentPose (Pose2d pose){
-    swerveDrivePoseEstimator.resetPosition(getGyroAngle(), getModulesPosition(), pose);
+    swerveDrivePoseEstimator.resetPosition(getYawAngle(), getModulesPosition(), pose);
+  }
+
+  public void resetChassisPosition (Pose2d initialPose){
+    resetYawAngle();
+    for (SwerveModule module : modules){
+      module.setPositionSpeedMotor(0);
+    }
+    swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(swerveDriveKinematics, getYawAngle(), getModulesPosition(), initialPose);
   }
   
   public void resetOdometry (Pose2d starting_pose){
@@ -196,45 +225,15 @@ public class Drive extends SubsystemBase  {
   public void setDesiredChassisSpeeds (ChassisSpeeds chassisSpeeds){
     desiredChassisSpeeds = chassisSpeeds;
   }
-
-  public void resetChassisPosition (Pose2d initialPose){
-    resetGyroAngle();
-    for (SwerveModule module : modules){
-      module.setPositionSpeedMotor(0);
-    }
-    swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(swerveDriveKinematics, getGyroAngle(), getModulesPosition(), initialPose);
-  }
-  
-  public void resetGyroAngle (){
-    gyro.reset();
-  }
-  
-  public Rotation2d getGyroAngle (){
-    return gyro.getRotation2d();
-  }
   
   public void updateOdometry (){
     if (vision.sawTag()){
       if (tagSearchActive){
-        MechanismMode mode = MechanismActionMode.getInstance().getMode();
-        tagMatch = false;
-        if (Robot.flip_alliance()){
-          if (mode == MechanismMode.Score){
-            tagMatch = vision.getTagID() == 1 || vision.getTagID() == 2 || vision.getTagID() == 3;
-          } else if (mode == MechanismMode.PickUp){
-            tagMatch = vision.getTagID() == 5;
-          }
-        } else {
-          if (mode == MechanismMode.Score){
-            tagMatch = vision.getTagID() == 6 || vision.getTagID() == 7 || vision.getTagID() == 8;
-          } else if (mode == MechanismMode.PickUp){
-            tagMatch = vision.getTagID() == 4;
-          }
-        }
+        readyForCorrectionPose = true;
       }
       swerveDrivePoseEstimator.addVisionMeasurement(vision.getBotPose(), Timer.getFPGATimestamp() - (vision.getLatencyPipeline()/1000.0) - (vision.getLatencyCapture()/1000.0));
     } else {
-      swerveDrivePoseEstimator.update(getGyroAngle(), getModulesPosition());
+      swerveDrivePoseEstimator.update(getYawAngle(), getModulesPosition());
     }
   }
 
@@ -254,6 +253,24 @@ public class Drive extends SubsystemBase  {
   public void toggleTagSearch (){
     tagSearchActive = !tagSearchActive;
     readyForCorrectionPose = false; 
+    MechanismMode mode = MechanismActionMode.getInstance().getMode();
+    if (tagSearchActive){
+      if (Robot.flip_alliance()){
+        if (mode == MechanismMode.Score){
+          vision.setPipeline(TypePipeline.RedGridTags);
+        } else if (mode == MechanismMode.PickUp){
+          vision.setPipeline(TypePipeline.RedStationTag);
+        }
+      } else {
+        if (mode == MechanismMode.Score){
+          vision.setPipeline(TypePipeline.BlueGridTags);
+        } else if (mode == MechanismMode.PickUp){
+          vision.setPipeline(TypePipeline.BlueStationTag);
+        }
+      }
+    } else {
+      vision.setPipeline(TypePipeline.AllTags);
+    }
   }
 
   public boolean isTagSearchActive (){
@@ -261,16 +278,75 @@ public class Drive extends SubsystemBase  {
   }
 
   public boolean isReadyForCorrectionPose (){
-    if (readyForCorrectionPose){
-      tagSearchActive = false;
-    }
     return readyForCorrectionPose; 
+  }
+
+  private double vel_first_stage = 0.0;
+  private double angle_1st_stage = 0.0;
+  private double vel_scnd_stage = 0.0;
+  private Double timeout = Double.NaN;
+  private Double starter_time = Double.NaN;
+  private PIDController pitch_controller = new PIDController(0, 0, 0);
+  private Debouncer angle_debouncer = new Debouncer(0.5, DebounceType.kBoth);
+
+  public void initAutoBalance (boolean isBackward){
+    autoB_stage = AutoBalanceStages.BreakTheResistance; 
+    if (isBackward){
+      vel_first_stage = -vel_first_stage;
+      vel_scnd_stage = -vel_scnd_stage; 
+    }
+    pitch_controller.setSetpoint(0.0);
+    pitch_controller.setTolerance(0.2);
+    pitch_controller.reset(); 
+  }
+
+  public ChassisSpeeds updateAutoBalance (double current_time){
+    if (autoB_stage == null){
+      System.out.println("Variable Auto Balance Not Initialized");
+      return new ChassisSpeeds();
+    }
+    if (starter_time.isNaN()){
+      starter_time = Timer.getFPGATimestamp();
+    }
+    ChassisSpeeds output = new ChassisSpeeds();
+    switch (autoB_stage){
+      case BreakTheResistance:
+      output = new ChassisSpeeds(0, vel_first_stage, 0);
+      boolean isOverLimitAngle = angle_1st_stage > 0 ? getPitchAngle().getDegrees() > angle_1st_stage : getPitchAngle().getDegrees() < angle_1st_stage; 
+      if (timeout.isNaN()){
+        timeout = 1.0;
+      }
+      if (isOverLimitAngle || current_time - starter_time > timeout){
+        autoB_stage = AutoBalanceStages.DriveEstimatedDistance;
+        timeout = Double.NaN;
+        starter_time = Double.NaN;
+      }
+      break;
+      case DriveEstimatedDistance:
+      output = new ChassisSpeeds(0, vel_scnd_stage, 0);
+      if (timeout.isNaN()){
+        timeout = 1.5;
+      }
+      if (current_time - starter_time > timeout){
+        autoB_stage = AutoBalanceStages.MaintainBalance;
+        timeout = Double.NaN;
+        starter_time = Double.NaN;
+      }
+      break;
+      case MaintainBalance:
+      boolean outOfTolerance = angle_debouncer.calculate(!pitch_controller.atSetpoint());
+      if (outOfTolerance){
+        output = new ChassisSpeeds(0, pitch_controller.calculate(getPitchAngle().getDegrees()), 0); 
+      }
+      break;
+    }
+    return output;
   }
 
   public void outputTelemetry (){
     Telemetry.tabDrive.addDouble("X Pose Odometry", ()->{return getCurrentPose().getX();}).withPosition(8, 0);
     Telemetry.tabDrive.addDouble("Y Pose Odometry", ()->{return getCurrentPose().getY();}).withPosition(9, 0);
-    Telemetry.tabDrive.addDouble("GyroAngle", ()->{return getGyroAngle().getDegrees();}).withPosition(8, 1); 
+    Telemetry.tabDrive.addDouble("YawAngle", ()->{return getYawAngle().getDegrees();}).withPosition(8, 1); 
     Telemetry.tabDrive.addDouble("TAG ID", ()->{return vision.getTagID();}).withPosition(9, 1);
   }
 }

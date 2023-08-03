@@ -171,9 +171,17 @@ public final class Constants {
   }
 
   public static enum TypePipeline {
-    GridsAprilTags,
-    RetroflectiveTape,
-    LeftDSubAprilTag,
-    RightDSubAprilTag
+    AllTags,
+    BlueGridTags,
+    BlueStationTag,
+    RedGridTags,
+    RedStationTag,
+    RetroflectiveTape
+  }
+
+  public static enum AutoBalanceStages {
+    BreakTheResistance, 
+    DriveEstimatedDistance,
+    MaintainBalance 
   }
 }
