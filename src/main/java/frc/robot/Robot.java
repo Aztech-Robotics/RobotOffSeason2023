@@ -19,8 +19,11 @@ public class Robot extends TimedRobot {
   private GamePieceMode gamePieceMode;
   private MechanismActionMode mechanismMode;
   private Telemetry telemetry;
+  private ActionManager actionManager;
   private Command m_autonomousCommand;
   private EventLoop loop_modes = new EventLoop();
+  private Command currentCommand = null;
+  private boolean currCommandScheduled = false;
   
   public static boolean flip_alliance (){
     return DriverStation.getAlliance() == Alliance.Red ? true : false;
@@ -28,7 +31,14 @@ public class Robot extends TimedRobot {
 
   public void modesBindings (){
     BooleanEvent gamePieceChanged = new BooleanEvent(loop_modes, () -> gamePieceMode.haveChanged());
-
+    gamePieceChanged.rising().ifHigh(
+      () -> {
+        if (currentCommand == null){
+          currentCommand = actionManager.requestStickyAction();
+          currCommandScheduled = false;
+        }
+      }
+    );
   }
 
   public void controlBindings (){
@@ -51,6 +61,7 @@ public class Robot extends TimedRobot {
             }
         }
     );
+    Controls.getUpD2().or(Controls.getDownD2()).or(Controls.getLeftD2()).or(Controls.getRightD2()).toggleOnTrue(moveActiveBox);
     InstantCommand moveActiveBox2 = new InstantCommand(
         () -> {
             double x = Controls.getLeftXD2().getAsDouble();
@@ -73,6 +84,15 @@ public class Robot extends TimedRobot {
         }
     );
     Controls.movingLeftJD2().whileTrue(new RepeatCommand(new SequentialCommandGroup(moveActiveBox2, new WaitCommand(0.3))));
+    Controls.getRBumperD1().toggleOnTrue(actionManager.requestPISearching());
+    Controls.getRBumperD2().toggleOnTrue(new InstantCommand(
+      () -> {
+        if (currentCommand == null){
+          currentCommand = actionManager.requestAction(); 
+          currCommandScheduled = false;
+        }
+      }
+    ));
 }
 
   @Override
@@ -80,6 +100,8 @@ public class Robot extends TimedRobot {
     telemetry = Telemetry.getInstance(); 
     gamePieceMode = GamePieceMode.getInstance();
     mechanismMode = MechanismActionMode.getInstance();
+    actionManager = ActionManager.getInstance();
+    currentCommand = null;
   }
 
   @Override
@@ -102,19 +124,32 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {
-    
-  }
+  public void autonomousPeriodic() {}
 
   @Override
   public void teleopInit() {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    modesBindings();
+    controlBindings();
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    loop_modes.poll();
+    if (currentCommand != null){
+      if (currCommandScheduled ){
+        if (currentCommand.isFinished()){
+          currentCommand = null;
+          currCommandScheduled = false;
+        }
+      } else {
+        currentCommand.schedule();
+        currCommandScheduled = true; 
+      }
+    }
+  }
 
   @Override
   public void testInit() {
