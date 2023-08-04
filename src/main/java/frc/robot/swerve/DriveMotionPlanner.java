@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants;
 import frc.robot.Robot;
 
 public class DriveMotionPlanner {
@@ -22,9 +23,9 @@ public class DriveMotionPlanner {
     private boolean isTrajectoryFinished = false;
 
     public DriveMotionPlanner (){
-        x_controller = new PIDController(0, 0, 0);
-        y_controller = new PIDController(0, 0, 0);
-        rotation_controller = new ProfiledPIDController(0, 0, 0, null);
+        x_controller = new PIDController(Constants.kp_x, Constants.ki_x, Constants.kd_x);
+        y_controller = new PIDController(Constants.kp_y, Constants.ki_y, Constants.kd_y);
+        rotation_controller = new ProfiledPIDController(Constants.kp_rot, Constants.ki_rot, Constants.kd_rot, Constants.rot_constraints);
         rotation_controller.enableContinuousInput(0, 2 * Math.PI);
         drive_controller = new HolonomicDriveController(y_controller, x_controller, rotation_controller);
     }

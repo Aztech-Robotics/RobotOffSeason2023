@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Controls {
-    public static CommandXboxController driver1 = new CommandXboxController(0);
-    public static CommandXboxController driver2 = new CommandXboxController(1);
+    private static CommandXboxController driver1 = new CommandXboxController(0);
+    private static CommandXboxController driver2 = new CommandXboxController(1);
 
     public static DoubleSupplier getLeftYD1 () {
         return () -> MathUtil.applyDeadband(driver1.getLeftY(), 0.2);
@@ -38,6 +38,26 @@ public class Controls {
         return () -> MathUtil.applyDeadband(driver2.getRightX(), 0.2);
     }
 
+    public static DoubleSupplier getRightYD2 () {
+        return () -> MathUtil.applyDeadband(driver2.getRightY(), 0.2);
+    }
+
+    public static DoubleSupplier getLeftTD1 (){
+        return () -> driver1.getLeftTriggerAxis();
+    }
+
+    public static DoubleSupplier getRightTD1 (){
+        return () -> driver1.getRightTriggerAxis();
+    }
+
+    public static DoubleSupplier getLeftTD2 (){
+        return () -> driver2.getLeftTriggerAxis();
+    }
+
+    public static DoubleSupplier getRightTD2 (){
+        return () -> driver2.getRightTriggerAxis();
+    }
+
     public static Trigger getRBumperD1 (){
         return driver1.rightBumper();
     }
@@ -64,6 +84,22 @@ public class Controls {
 
     public static Trigger getYD2 (){
         return driver2.y();
+    }
+
+    public static Trigger getUpD2 (){
+        return driver2.povUp();
+    }
+
+    public static Trigger getDownD2 (){
+        return driver2.povDown();
+    }
+
+    public static Trigger getLeftD2 (){
+        return driver2.povLeft();
+    }
+
+    public static Trigger getRightD2 (){
+        return driver2.povRight();
     }
 
     public static Trigger movingLeftJD2 (){

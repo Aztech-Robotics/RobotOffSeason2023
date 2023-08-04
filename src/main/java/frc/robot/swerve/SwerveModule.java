@@ -34,28 +34,28 @@ public class SwerveModule {
     public SwerveModule (int id_speedMotor, int id_steerMotor, int id_steerCanCoder, Rotation2d steerOffset){
         speedMotor = new CANSparkMax(id_speedMotor, MotorType.kBrushless);
         encoder_speedMotor = speedMotor.getEncoder();
-        encoder_speedMotor.setPositionConversionFactor(Constants.DriveTrain.drivePositionCoefficient);
+        encoder_speedMotor.setPositionConversionFactor(Constants.drivePositionCoefficient);
         controller_speedMotor = speedMotor.getPIDController();
         controller_speedMotor.setFeedbackDevice(encoder_speedMotor);
-        controller_speedMotor.setP(Constants.DriveTrain.kp_speedController, 0);
-        controller_speedMotor.setI(Constants.DriveTrain.ki_speedController, 0);
-        controller_speedMotor.setD(Constants.DriveTrain.kd_speedController, 0);
-        controller_speedMotor.setFF(Constants.DriveTrain.kf_speedController, 0);
-        controller_speedMotor.setIZone(Constants.DriveTrain.kIz_speedController, 0);
+        controller_speedMotor.setP(Constants.kp_speedController, 0);
+        controller_speedMotor.setI(Constants.ki_speedController, 0);
+        controller_speedMotor.setD(Constants.kd_speedController, 0);
+        controller_speedMotor.setFF(Constants.kf_speedController, 0);
+        controller_speedMotor.setIZone(Constants.kIz_speedController, 0);
 
         steerMotor = new CANSparkMax(id_steerMotor, MotorType.kBrushless);
         steerMotor.setSmartCurrentLimit(50);
         speedMotor.setSmartCurrentLimit(50);
         encoder_steerMotor = steerMotor.getEncoder();
-        encoder_steerMotor.setPositionConversionFactor(Constants.DriveTrain.steerPositionCoefficient);
-        encoder_steerMotor.setVelocityConversionFactor(Constants.DriveTrain.steerVelocityCoefficient);
+        encoder_steerMotor.setPositionConversionFactor(Constants.steerPositionCoefficient);
+        encoder_steerMotor.setVelocityConversionFactor(Constants.steerVelocityCoefficient);
         controller_steerMotor = steerMotor.getPIDController();
         controller_steerMotor.setFeedbackDevice(encoder_steerMotor);
-        controller_steerMotor.setP(Constants.DriveTrain.kp_steerController, 0);
-        controller_steerMotor.setI(Constants.DriveTrain.ki_steerController, 0);
-        controller_steerMotor.setD(Constants.DriveTrain.kd_steerController, 0);
-        controller_steerMotor.setFF(Constants.DriveTrain.kf_steerController, 0);
-        controller_steerMotor.setIZone(Constants.DriveTrain.kIz_steerController, 0);
+        controller_steerMotor.setP(Constants.kp_steerController, 0);
+        controller_steerMotor.setI(Constants.ki_steerController, 0);
+        controller_steerMotor.setD(Constants.kd_steerController, 0);
+        controller_steerMotor.setFF(Constants.kf_steerController, 0);
+        controller_steerMotor.setIZone(Constants.kIz_steerController, 0);
         controller_steerMotor.setPositionPIDWrappingEnabled(true);
         controller_steerMotor.setPositionPIDWrappingMinInput(0);
         controller_steerMotor.setPositionPIDWrappingMaxInput(Math.PI * 2);
@@ -81,7 +81,7 @@ public class SwerveModule {
     }
     
     public double getVelocitySpeedMotor (){
-        return (encoder_speedMotor.getVelocity() * Constants.DriveTrain.driveVelocityCoefficient);
+        return (encoder_speedMotor.getVelocity() * Constants.driveVelocityCoefficient);
     }
     
     public void setPositionSpeedMotor (double position){
@@ -133,7 +133,7 @@ public class SwerveModule {
     
     public void setModuleState (SwerveModuleState moduleState){
         desiredState = SwerveModuleState.optimize(moduleState, getCanCoderAngle());
-        velocitySpeedMotor(desiredState.speedMetersPerSecond / Constants.DriveTrain.maxDriveVel);
+        velocitySpeedMotor(desiredState.speedMetersPerSecond / Constants.maxDriveVel);
         angleSteerMotor(desiredState.angle);
     }
     

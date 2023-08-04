@@ -54,7 +54,6 @@ public class Arm extends SubsystemBase {
   }
 
   public void setAngle (Rotation2d angle){
-    
   }
 
   public boolean isAtTargetPosition () {

@@ -33,10 +33,10 @@ import frc.robot.swerve.SwerveModule;
 public class Drive extends SubsystemBase  {
   private static Drive drive;
   public static SwerveDriveKinematics swerveDriveKinematics = new SwerveDriveKinematics(
-    new Translation2d(Constants.DriveTrain.trackWidth/2, Constants.DriveTrain.wheelBase/2),
-    new Translation2d(Constants.DriveTrain.trackWidth/2, -Constants.DriveTrain.wheelBase/2),
-    new Translation2d(-Constants.DriveTrain.trackWidth/2, Constants.DriveTrain.wheelBase/2),
-    new Translation2d(-Constants.DriveTrain.trackWidth/2, -Constants.DriveTrain.wheelBase/2)
+    new Translation2d(Constants.trackWidth/2, Constants.wheelBase/2),
+    new Translation2d(Constants.trackWidth/2, -Constants.wheelBase/2),
+    new Translation2d(-Constants.trackWidth/2, Constants.wheelBase/2),
+    new Translation2d(-Constants.trackWidth/2, -Constants.wheelBase/2)
   );
   private SwerveModule[] modules = new SwerveModule[4];
   private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
@@ -54,28 +54,28 @@ public class Drive extends SubsystemBase  {
   
   private Drive() {
     modules[0] = new SwerveModule(
-      Constants.DriveTrain.id_speed_fLeft,
-      Constants.DriveTrain.id_steer_fLeft, 
-      Constants.DriveTrain.id_canCoder_fLeft, 
-      Constants.DriveTrain.offset_fLeft
+      Constants.id_speed_fLeft,
+      Constants.id_steer_fLeft, 
+      Constants.id_canCoder_fLeft, 
+      Constants.offset_fLeft
     );
     modules[1] = new SwerveModule(
-      Constants.DriveTrain.id_speed_fRight, 
-      Constants.DriveTrain.id_steer_fRight, 
-      Constants.DriveTrain.id_canCoder_fRight, 
-      Constants.DriveTrain.offset_fRight
+      Constants.id_speed_fRight, 
+      Constants.id_steer_fRight, 
+      Constants.id_canCoder_fRight, 
+      Constants.offset_fRight
     );
     modules[2] = new SwerveModule(
-      Constants.DriveTrain.id_speed_bLeft, 
-      Constants.DriveTrain.id_steer_bLeft, 
-      Constants.DriveTrain.id_canCoder_bLeft, 
-      Constants.DriveTrain.offset_bLeft
+      Constants.id_speed_bLeft, 
+      Constants.id_steer_bLeft, 
+      Constants.id_canCoder_bLeft, 
+      Constants.offset_bLeft
     );
     modules[3] = new SwerveModule(
-      Constants.DriveTrain.id_speed_bRight, 
-      Constants.DriveTrain.id_steer_bRight, 
-      Constants.DriveTrain.id_canCoder_bRight, 
-      Constants.DriveTrain.offset_bRight
+      Constants.id_speed_bRight, 
+      Constants.id_steer_bRight, 
+      Constants.id_canCoder_bRight, 
+      Constants.offset_bRight
     ); 
     swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(swerveDriveKinematics, 
     getYawAngle(), 
@@ -131,7 +131,7 @@ public class Drive extends SubsystemBase  {
           }
           else {
             modules_states = swerveDriveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
-            SwerveDriveKinematics.desaturateWheelSpeeds(modules_states, Constants.DriveTrain.maxDriveVel);
+            SwerveDriveKinematics.desaturateWheelSpeeds(modules_states, Constants.maxDriveVel);
           }
           setModulesStates(modules_states);
         }
@@ -284,7 +284,7 @@ public class Drive extends SubsystemBase  {
   private double vel_scnd_stage = 0.0;
   private Double timeout = Double.NaN;
   private Double starter_time = Double.NaN;
-  private PIDController pitch_controller = new PIDController(0, 0, 0);
+  private PIDController pitch_controller = new PIDController(Constants.kp_autoB, Constants.ki_autoB, Constants.kd_autoB);
   private Debouncer angle_debouncer = new Debouncer(0.5, DebounceType.kBoth);
   private boolean autoBalanceIsDone = false;
 
@@ -313,7 +313,7 @@ public class Drive extends SubsystemBase  {
     ChassisSpeeds output = new ChassisSpeeds();
     switch (autoB_stage){
       case BreakTheResistance:
-      output = new ChassisSpeeds(0, vel_first_stage, 0);
+      output = new ChassisSpeeds(vel_first_stage, 0, 0);
       boolean isOverLimitAngle = angle_1st_stage > 0 ? getPitchAngle().getDegrees() > angle_1st_stage : getPitchAngle().getDegrees() < angle_1st_stage; 
       if (timeout.isNaN()){
         timeout = 1.0;
@@ -325,7 +325,7 @@ public class Drive extends SubsystemBase  {
       }
       break;
       case DriveEstimatedDistance:
-      output = new ChassisSpeeds(0, vel_scnd_stage, 0);
+      output = new ChassisSpeeds(vel_scnd_stage, 0, 0);
       if (timeout.isNaN()){
         timeout = 1.5;
       }
@@ -338,7 +338,7 @@ public class Drive extends SubsystemBase  {
       case MaintainBalance:
       boolean outOfTolerance = angle_debouncer.calculate(!pitch_controller.atSetpoint());
       if (outOfTolerance){
-        output = new ChassisSpeeds(0, pitch_controller.calculate(getPitchAngle().getDegrees()), 0); 
+        output = new ChassisSpeeds(pitch_controller.calculate(getPitchAngle().getDegrees()), 0, 0); 
       } else {
         autoBalanceIsDone = true;
       }
