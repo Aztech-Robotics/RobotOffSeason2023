@@ -68,19 +68,19 @@ public final class Constants {
   public static final int id_canCoder_fLeft = 3;
   public static final Rotation2d offset_fLeft = Rotation2d.fromDegrees(0);
 
-  public static final int id_speed_fRight = 5;
-  public static final int id_steer_fRight = 6;
-  public static final int id_canCoder_fRight = 7;
+  public static final int id_speed_fRight = 4;
+  public static final int id_steer_fRight = 5;
+  public static final int id_canCoder_fRight = 6;
   public static final Rotation2d offset_fRight = Rotation2d.fromDegrees(0);
 
-  public static final int id_speed_bLeft = 9;
-  public static final int id_steer_bLeft = 10;
-  public static final int id_canCoder_bLeft = 11;
+  public static final int id_speed_bLeft = 7;
+  public static final int id_steer_bLeft = 8;
+  public static final int id_canCoder_bLeft = 9;
   public static final Rotation2d offset_bLeft = Rotation2d.fromDegrees(0);
 
-  public static final int id_speed_bRight = 13;
-  public static final int id_steer_bRight = 14;
-  public static final int id_canCoder_bRight = 15;
+  public static final int id_speed_bRight = 10;
+  public static final int id_steer_bRight = 11;
+  public static final int id_canCoder_bRight = 12;
   public static final Rotation2d offset_bRight = Rotation2d.fromDegrees(0); 
 
   public static final double kp_steerController = 0.8;
@@ -96,26 +96,25 @@ public final class Constants {
   public static final double kIz_speedController = 0.0;
   
   //Arm 
-  public static final int id_arm_master = 17;
-  public static final int id_arm_sleeve = 18;
-  public static final double arm_reduction = 0;
+  public static final int id_arm_master = 13;
+  public static final int id_arm_sleeve = 14;
+  public static final double arm_ratio = 137.5;
   public static final double kp_arm = 0;
   public static final double ki_arm = 0;
   public static final double kd_arm = 0;
-  public static final double kf_arm = 0;
+  public static final double ks_arm = 0;
+  public static final double kv_arm = 0;
+  public static final double ff_arm = 0;
 
   //Telescopic
-  public static final int id_tel_master = 19;
-  public static final int id_tel_sleeve = 20;
+  public static final int id_tel_master = 15;
+  public static final int id_tel_sleeve = 16;
 
   //Wrist
-  public static final int id_wrist = 21;
-
-  //Art
-  public static final int id_art = 22;
+  public static final int id_wrist = 17;
 
   //Intake
-  public static final int id_intake = 23;
+  public static final int id_intake = 18;
   
   //Trajectories Paths
   public static final String pathPickUp2ndPiece = "paths/PickUp2ndPiece.path";

@@ -1,13 +1,16 @@
 package frc.robot.modes;
 
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Telemetry;
 import frc.robot.Constants.MechanismMode;
 
-public class MechanismActionMode {
+public class MechanismActionMode extends SubsystemBase {
     private static MechanismActionMode mechanismMode = null;
     private static MechanismMode activeMode;
     private boolean notifier = false;
+    private String value = "";
 
     private MechanismActionMode (){}
 
@@ -28,20 +31,19 @@ public class MechanismActionMode {
         activeMode = mode;
     }
 
-    public InstantCommand commandSetMode (MechanismMode mode){
-        InstantCommand command = new InstantCommand(
+    public CommandBase commandSetMode (MechanismMode mode){
+        return runOnce(
             () -> {
                 notifier = true;
                 activeMode = mode; 
             }
         );
-        return command;
     }
 
-    public InstantCommand toggleDriverMode (){
-        notifier = true;
-        InstantCommand command = new InstantCommand(
+    public CommandBase toggleDriverMode (){
+        return runOnce(
             () -> {
+                notifier = true;
                 if (activeMode == MechanismMode.PickUp){
                     activeMode = MechanismMode.Score;
                 }
@@ -50,7 +52,6 @@ public class MechanismActionMode {
                 }
             }
         );
-        return command;
     }
 
     public boolean haveChanged (){
@@ -64,7 +65,6 @@ public class MechanismActionMode {
     }
 
     public void outputTelemetry (){
-        String value = "";
         switch (activeMode){
             case ManualMode:
             value = "ManualMode";
@@ -79,6 +79,6 @@ public class MechanismActionMode {
             value = "Score";
             break;
         }
-        Telemetry.tabDriver.add("Mechanism Mode", value).withSize(1, 1).withPosition(4, 3);
+        //Telemetry.tabDriver.addString("Mechanism Mode", () -> {return value;}).withSize(1, 1).withPosition(4, 3);
     }
 }

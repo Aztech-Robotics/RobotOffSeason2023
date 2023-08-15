@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.actions.TrajectoryOnTheFly;
+import frc.robot.commands.FieldOrientedDrive;
 import frc.robot.actions.DropPiece;
 import frc.robot.actions.ManualMode;
 import frc.robot.actions.PickUpDouble;
@@ -28,7 +29,7 @@ public class ActionManager {
     private Drive drive = Drive.getInstance();
     private ActionInterface sticky_action;
     private MechanismActionMode mechanismActionMode = MechanismActionMode.getInstance();
-    private Telemetry telemetry = Telemetry.getInstance();
+    //private Telemetry telemetry = Telemetry.getInstance();
     private ManualMode manualMode;
     private SaveMechanism saveMechanism;
     private PickUpDouble pickUpDouble;
@@ -42,6 +43,7 @@ public class ActionManager {
     private DropPiece dropPiece; 
     private boolean isCommandAwait = false;
     private List<Command> commandsAwait = new ArrayList<>();
+    private FieldOrientedDrive driveControl = new FieldOrientedDrive(null, null, null);
 
     private ActionManager (){
         trajectoryOnTheFly = new TrajectoryOnTheFly();
@@ -54,6 +56,7 @@ public class ActionManager {
         scoreMiddle = new ScoreMiddle();
         scoreTop = new ScoreTop();
         sticky_action = saveMechanism;
+        drive.setDefaultCommand(driveControl);
     }
 
     public static ActionManager getInstance (){
@@ -86,11 +89,12 @@ public class ActionManager {
                 action = saveMechanism.getActionCommand();
                 break;
                 case PickUp:
-                int station = telemetry.getActiveStation();
-                if (drive.isTagSearchActive() && drive.isReadyForCorrectionPose() && station != 0){
-                    driveCommand = trajectoryOnTheFly.getStationActionCommand(station);
-                    drive.toggleTagSearch();
-                }
+                //int station = telemetry.getActiveStation();
+                // if (drive.isTagSearchActive() && drive.isReadyForCorrectionPose() && station != 0){
+                //     driveCommand = trajectoryOnTheFly.getStationActionCommand(station);
+                //     drive.toggleTagSearch();
+                // }
+                /*
                 switch (station){
                     case 0:
                     mechanismAction = pickUpFloor; 
@@ -102,6 +106,7 @@ public class ActionManager {
                     mechanismAction = pickUpDouble;
                     break;
                 }
+                */
                 mechanismCommand = new SequentialCommandGroup(mechanismAction.getActionCommand(), takePiece.getActionCommand());
                 if (driveCommand != null){
                     action = new ParallelCommandGroup(mechanismCommand, new SequentialCommandGroup(new WaitCommand(2), driveCommand)); 
@@ -110,12 +115,13 @@ public class ActionManager {
                 }
                 break;
                 case Score:
-                int level = telemetry.getNodeLevel();
-                int node = telemetry.getNode();
+                //int level = telemetry.getNodeLevel();
+                //int node = telemetry.getNode();
                 if (drive.isTagSearchActive() && drive.isReadyForCorrectionPose()){
-                    driveCommand = trajectoryOnTheFly.getGridActionCommand(node);
+                    //driveCommand = trajectoryOnTheFly.getGridActionCommand(node);
                     drive.toggleTagSearch();
                 }
+                /*
                 switch (level){
                     case 3:
                     mechanismAction = scoreTop; 
@@ -127,6 +133,8 @@ public class ActionManager {
                     mechanismAction = scoreBottom; 
                     break;
                 }
+                
+                */
                 mechanismCommand = mechanismAction.getActionCommand();
                 isCommandAwait = true;
                 if (driveCommand != null){

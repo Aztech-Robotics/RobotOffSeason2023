@@ -12,6 +12,11 @@ public class ArmPosition extends CommandBase {
 
   @Override
   public void initialize() {
-    arm.setAngle(Rotation2d.fromDegrees(0));
+    arm.setAngle(Rotation2d.fromDegrees(90));
+  }
+
+  @Override
+  public boolean isFinished() {
+    return arm.isAtTargetPosition();
   }
 }

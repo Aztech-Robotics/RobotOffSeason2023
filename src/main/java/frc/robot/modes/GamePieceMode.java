@@ -1,10 +1,14 @@
 package frc.robot.modes;
 
+import java.util.Map;
+
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Telemetry;
 import frc.robot.Constants.GameElement;
 
-public class GamePieceMode {
+public class GamePieceMode extends SubsystemBase {
     private static GamePieceMode generalMode = null;
     private static GameElement activeMode;
     private boolean notifier = false;
@@ -28,20 +32,19 @@ public class GamePieceMode {
         activeMode = mode;
     }
 
-    public InstantCommand commandSetMode (GameElement mode){
-        InstantCommand command = new InstantCommand(
+    public CommandBase commandSetMode (GameElement mode){
+        return runOnce(
             () -> {
                 notifier = true;
                 activeMode = mode; 
             }
         );
-        return command;
     }
 
-    public InstantCommand toggleMode (){
-        notifier = true;
-        InstantCommand command = new InstantCommand(
+    public CommandBase toggleMode (){
+        return runOnce(
             () -> {
+                notifier = true;
                 if (activeMode == GameElement.Cone){
                     activeMode = GameElement.Cube;
                 }
@@ -50,7 +53,6 @@ public class GamePieceMode {
                 }
             }
         );
-        return command;
     }
 
     public boolean haveChanged (){
@@ -64,13 +66,13 @@ public class GamePieceMode {
     }
 
     public void outputTelemetry (){
-        Telemetry.tabDriver.addBoolean("GamePiece", 
-        () -> {
-            boolean value = false;
-            if (GamePieceMode.getInstance().getMode() == GameElement.Cone){
-                value = true;
-            }
-            return value;
-        }).withSize(1, 1).withPosition(4, 3);
+        // Telemetry.tabDriver.addBoolean("GamePiece", 
+        // () -> {
+        //     boolean value = false;
+        //     if (GamePieceMode.getInstance().getMode() == GameElement.Cone){
+        //         value = true;
+        //     }
+        //     return value;
+        // }).withSize(1, 1).withPosition(4, 3).withProperties(Map.of("Color when true","#ffff00","Color when false","#8066cc"));
     }
 }

@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import frc.robot.Constants;
+import frc.robot.Controls;
 import frc.robot.Constants.SwerveMode;
 import frc.robot.subsystems.Drive;
 
@@ -16,9 +17,9 @@ public class FieldOrientedDrive extends CommandBase {
   private final DoubleSupplier translationYSupplier;
   private final DoubleSupplier rotationSupplier;
   public FieldOrientedDrive(DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier, DoubleSupplier rotationSupplier) {
-    this.translationXSupplier = translationXSupplier;
-    this.translationYSupplier = translationYSupplier;
-    this.rotationSupplier = rotationSupplier;
+    this.translationXSupplier = Controls.getLeftXD1();
+    this.translationYSupplier = Controls.getLeftYD1();
+    this.rotationSupplier = Controls.getRightXD1();
     addRequirements(m_SwerveDrive);
   }
 

@@ -1,40 +1,50 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxLimitSwitch;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMax.SoftLimitDirection;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
+import com.ctre.phoenix6.signals.ForwardLimitValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
+import com.ctre.phoenix6.signals.ReverseLimitValue;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Telemetry;
 
 public class Arm extends SubsystemBase {
   private static Arm arm;
-  private CANSparkMax arm_master = new CANSparkMax(Constants.id_arm_master, MotorType.kBrushless);
-  private RelativeEncoder encoder = arm_master.getEncoder();
-  private SparkMaxPIDController pid_controller = arm_master.getPIDController();
-  private SparkMaxLimitSwitch limit_reverse = arm_master.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);
-  private CANSparkMax arm_sleeve = new CANSparkMax(Constants.id_arm_sleeve, MotorType.kBrushless);
-  private ArmFeedforward feedforward = new ArmFeedforward(0, 0, 0);
-  private double desiredPosition = 0;
+  private final TalonFX arm_master = new TalonFX(Constants.id_arm_master);
+  private final TalonFX arm_sleeve = new TalonFX(Constants.id_arm_sleeve);
+  private final TalonFXConfiguration config = new TalonFXConfiguration();
+  private Rotation2d targetAngle = null;
+  private boolean isAtTarget = false;
   private Arm() {
-    arm_master.enableVoltageCompensation(12);
-    arm_master.setInverted(false);
-    limit_reverse.enableLimitSwitch(true);
-    arm_master.enableSoftLimit(SoftLimitDirection.kForward, true);
-    arm_master.setSoftLimit(SoftLimitDirection.kForward, 0);
-    encoder.setPositionConversionFactor(Constants.arm_reduction);
-    pid_controller.setP(0, 0);
-    pid_controller.setI(0, 0);
-    pid_controller.setD(0, 0);
-    pid_controller.setFF(0, 0);
-    pid_controller.setOutputRange(0, 1, 0);
-    arm_sleeve.follow(arm_master, true);
+    config.CurrentLimits.StatorCurrentLimitEnable = true;
+    config.CurrentLimits.StatorCurrentLimit = 80.0;
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
+    config.CurrentLimits.SupplyCurrentLimit = 50.0;
+    config.Feedback.SensorToMechanismRatio = Constants.arm_ratio;
+    config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.0; //Max Angle
+    config.HardwareLimitSwitch.ReverseLimitType = ReverseLimitTypeValue.NormallyClosed;
+    config.HardwareLimitSwitch.ReverseLimitEnable = true;
+    config.HardwareLimitSwitch.ReverseLimitAutosetPositionEnable = true;
+    config.HardwareLimitSwitch.ReverseLimitAutosetPositionValue = 0.0; //Zero Pos
+    config.Slot0.kP = Constants.kp_arm;
+    config.Slot0.kI = Constants.ki_arm;
+    config.Slot0.kD = Constants.kd_arm;
+    config.Slot0.kS = Constants.ks_arm;
+    config.Slot0.kV = Constants.kv_arm;
+    arm_master.getConfigurator().apply(config);
+    arm_sleeve.getConfigurator().apply(config);
+    setNeutralMode(NeutralModeValue.Coast);
+    outputTelemetry();
   }
 
   public static Arm getInstance (){
@@ -44,19 +54,44 @@ public class Arm extends SubsystemBase {
     return arm;
   }
 
-  public void setNeutralMode (IdleMode idleMode) {
-    arm_master.setIdleMode(idleMode);
-    arm_sleeve.setIdleMode(idleMode);
-  }
-
   @Override
   public void periodic() {
+    if (targetAngle != null && Math.abs(arm_master.getClosedLoopError().getValue()) < 1){
+      isAtTarget = true;
+      targetAngle = null; 
+    }
   }
 
   public void setAngle (Rotation2d angle){
+    PositionDutyCycle requestMaster = new PositionDutyCycle(angle.getRotations(), true, Constants.ff_arm, 0, true);
+    Follower requestSleeve = new Follower(arm_master.getDeviceID(), true);
+    arm_master.setControl(requestMaster);
+    arm_sleeve.setControl(requestSleeve);
+    targetAngle = angle;
+    isAtTarget = false;
+  }
+
+  public void setVelocity (double output){
+    DutyCycleOut requestVel = new DutyCycleOut(output);
+    arm_master.setControl(requestVel);  
+    Follower requestSleeve = new Follower(arm_master.getDeviceID(), true);
+    arm_sleeve.setControl(requestSleeve);
   }
 
   public boolean isAtTargetPosition () {
-    return false; 
+    return isAtTarget;
+  }
+
+  public void setNeutralMode (NeutralModeValue mode){
+    MotorOutputConfigs config = new MotorOutputConfigs();
+    config.NeutralMode = mode;
+    arm_master.getConfigurator().apply(config);
+    arm_sleeve.getConfigurator().apply(config);
+  }
+
+  public void outputTelemetry (){
+    Telemetry.mechanismTab.addDouble("Arm Angle ", () -> Rotation2d.fromRotations(arm_master.getPosition().getValue()).getDegrees());
+    Telemetry.mechanismTab.addBoolean("Arm FLimit", () -> arm_master.getForwardLimit().getValue() == ForwardLimitValue.Open ? true : false);
+    Telemetry.mechanismTab.addBoolean("Arm RLimit", () -> arm_master.getReverseLimit().getValue() == ReverseLimitValue.Open ? true : false);
   }
 }

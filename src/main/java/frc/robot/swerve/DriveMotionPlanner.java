@@ -88,4 +88,8 @@ public class DriveMotionPlanner {
     public boolean isTrajectoryFinished() {
         return current_trajectory != null && isTrajectoryFinished;
     }
+
+    public void outputTelemetry (){
+        
+    }
 }

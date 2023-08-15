@@ -39,7 +39,7 @@ public class Drive extends SubsystemBase  {
     new Translation2d(-Constants.trackWidth/2, -Constants.wheelBase/2)
   );
   private SwerveModule[] modules = new SwerveModule[4];
-  private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
+  private ADXRS450_Gyro yaw_gyro = new ADXRS450_Gyro();
   private Vision vision = Vision.getInstance();
   private SwerveDrivePoseEstimator swerveDrivePoseEstimator;
   private DriveMotionPlanner motionPlanner;
@@ -184,14 +184,15 @@ public class Drive extends SubsystemBase  {
   }
   
   public void resetYawAngle (){
-    gyro.reset();
+    yaw_gyro.reset();
   }
   
   public Rotation2d getYawAngle (){
-    return Rotation2d.fromDegrees(Math.IEEEremainder(-gyro.getAngle(), 360));
+    return Rotation2d.fromDegrees(Math.IEEEremainder(-yaw_gyro.getAngle(), 360));
   }
 
   public void resetPitchAngle (){
+
   }
   
   public Rotation2d getPitchAngle (){
@@ -356,9 +357,13 @@ public class Drive extends SubsystemBase  {
   }
 
   public void outputTelemetry (){
-    Telemetry.tabDrive.addDouble("X Pose Odometry", ()->{return getCurrentPose().getX();}).withPosition(8, 0);
-    Telemetry.tabDrive.addDouble("Y Pose Odometry", ()->{return getCurrentPose().getY();}).withPosition(9, 0);
-    Telemetry.tabDrive.addDouble("YawAngle", ()->{return getYawAngle().getDegrees();}).withPosition(8, 1); 
-    Telemetry.tabDrive.addDouble("TAG ID", ()->{return vision.getTagID();}).withPosition(9, 1);
+    Telemetry.swerveTab.addDouble("X Pose Odometry", () -> getCurrentPose().getX()).withPosition(8, 0);
+    Telemetry.swerveTab.addDouble("Y Pose Odometry", () -> getCurrentPose().getY()).withPosition(9, 0);
+    Telemetry.swerveTab.addDouble("Yaw Angle", () -> getYawAngle().getDegrees()).withPosition(8, 1); 
+    Telemetry.swerveTab.addDouble("Pitch Angle", () -> getPitchAngle().getDegrees()).withPosition(9, 1);
+    Telemetry.swerveTab.addBoolean("Odometry Reseted", () -> isReadyForAuto()).withPosition(0, 3);
+    Telemetry.swerveTab.addDouble("X Error", () -> motionPlanner.getTranslationalError(getCurrentPose(), Timer.getFPGATimestamp()).getX());
+    Telemetry.swerveTab.addDouble("Y Error", () -> motionPlanner.getTranslationalError(getCurrentPose(), Timer.getFPGATimestamp()).getY());
+    Telemetry.swerveTab.addDouble("Theta Error", () -> motionPlanner.getRotationalError(getYawAngle()).getDegrees());
   }
 }

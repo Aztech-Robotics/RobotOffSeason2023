@@ -13,10 +13,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants;
+import frc.robot.Telemetry;
 
 public class SwerveModule {
     private CANSparkMax speedMotor;
@@ -26,7 +25,6 @@ public class SwerveModule {
     private RelativeEncoder encoder_steerMotor;
     private SparkMaxPIDController controller_steerMotor;
     private CANCoder cancoder_steerMotor;
-    private ShuffleboardTab tabSwerve = Shuffleboard.getTab("SwerveData");
     private SwerveModuleState desiredState = new SwerveModuleState();
     public boolean isBrakeMode = false; 
 
@@ -167,13 +165,10 @@ public class SwerveModule {
     }
 
     public void outputTelemetry (){
-        ShuffleboardLayout motorsData = tabSwerve.getLayout("Module " + speedMotor.getDeviceId() + "-" + steerMotor.getDeviceId(), BuiltInLayouts.kList).withSize(2, 3);
-        motorsData.addDouble("SpeedMotorPosition", () -> {return getPositionSpeedMotor();});
-        motorsData.addDouble("SpeedMotorVelocity", () -> {return getVelocitySpeedMotor();});
-        motorsData.addDouble("CanCoderAngle", () -> {return getCanCoderAngle().getDegrees();});
-        motorsData.addDouble("SteerMotorAngle", () -> {return getSteerMotorAngle().getDegrees();});
-        motorsData.addDouble("DS Velocity", ()->{return getDesiredModuleState().speedMetersPerSecond;});
-        motorsData.addDouble("DS Angle", ()->{return getDesiredModuleState().angle.getDegrees();});
-
+        ShuffleboardLayout motorsData = Telemetry.swerveTab.getLayout("Module " + speedMotor.getDeviceId() + "-" + steerMotor.getDeviceId(), BuiltInLayouts.kList).withSize(2, 3);
+        motorsData.addDouble("ModVel", () -> {return getVelocitySpeedMotor();});
+        motorsData.addDouble("DSVel", ()->{return getDesiredModuleState().speedMetersPerSecond;});
+        motorsData.addDouble("ModAngle", () -> {return getSteerMotorAngle().getDegrees();});
+        motorsData.addDouble("DSAngle", ()->{return getDesiredModuleState().angle.getDegrees();});
     }
 }
