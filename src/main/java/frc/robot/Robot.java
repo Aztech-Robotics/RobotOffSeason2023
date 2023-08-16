@@ -1,30 +1,25 @@
 package frc.robot;
 
+import edu.wpi.first.util.concurrent.Event;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.MechanismMode;
+import frc.robot.interfaces.AutoInterface;
 import frc.robot.modes.GamePieceMode;
 import frc.robot.modes.MechanismActionMode;
+import frc.robot.subsystems.Drive;
 
 public class Robot extends TimedRobot {
+  private ActionManager actionManager;
   private GamePieceMode gamePieceMode;
   private MechanismActionMode mechanismMode;
-  private Telemetry telemetry;
-  private ActionManager actionManager;
-  private Command m_autonomousCommand;
-  private EventLoop loop_modes = new EventLoop();
-  private Command currentCommand = null;
-  private boolean currCommandScheduled = false;
+  private Drive drive  = Drive.getInstance();
+  private Command autonomousCommand;
+  private EventLoop loop = new EventLoop();
   
   public static boolean flip_alliance (){
     return DriverStation.getAlliance() == Alliance.Red ? true : false;
@@ -32,12 +27,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    telemetry = Telemetry.getInstance(); 
+    actionManager = new ActionManager();
     gamePieceMode = GamePieceMode.getInstance();
     mechanismMode = MechanismActionMode.getInstance();
-    actionManager = ActionManager.getInstance();
-    currentCommand = null;
-    loop_modes.clear();
+    teleopBindings();
+    Telemetry.displayAutos();
   }
 
   public void teleopBindings (){
@@ -45,12 +39,16 @@ public class Robot extends TimedRobot {
     Controls.driver2.b().onTrue(mechanismMode.toggleDriverMode());
     Controls.driver2.x().onTrue(mechanismMode.commandSetMode(MechanismMode.ManualMode));
     Controls.driver2.y().onTrue(mechanismMode.commandSetMode(MechanismMode.SaveMechanism));
+    Controls.driver2.povUp().onTrue(actionManager.moveLevel(1));
+    Controls.driver2.povDown().onTrue(actionManager.moveLevel(-1));
+    Controls.driver2.povRight().onTrue(actionManager.moveStation(1));
+    Controls.driver2.povLeft().onTrue(actionManager.moveStation(-1));
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    loop_modes.poll();
+    loop.poll();
   }
 
   @Override
@@ -61,10 +59,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = null;
-    //m_autonomousCommand = telemetry.getAutonomousCommand();
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    AutoInterface auto_selected = Telemetry.auto_chooser.getSelected();
+    if (auto_selected != null) {
+      drive.resetOdometry(auto_selected.getStartingPose());
+      autonomousCommand = auto_selected.getAutoCommand();
+      autonomousCommand.schedule();
     }
   }
 
@@ -73,27 +72,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    if (autonomousCommand != null) {
+      autonomousCommand.cancel();
     }
   }
 
   @Override
-  public void teleopPeriodic() {
-    /*
-    if (currentCommand != null){
-      if (currCommandScheduled ){
-        if (currentCommand.isFinished()){
-          currentCommand = null;
-          currCommandScheduled = false;
-        }
-      } else {
-        currentCommand.schedule();
-        currCommandScheduled = true; 
-      }
-    }
-    */
-  }
+  public void teleopPeriodic() {}
 
   @Override
   public void testInit() {

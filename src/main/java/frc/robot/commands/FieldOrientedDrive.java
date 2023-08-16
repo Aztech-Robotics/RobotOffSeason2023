@@ -16,7 +16,7 @@ public class FieldOrientedDrive extends CommandBase {
   private final DoubleSupplier translationXSupplier;
   private final DoubleSupplier translationYSupplier;
   private final DoubleSupplier rotationSupplier;
-  public FieldOrientedDrive(DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier, DoubleSupplier rotationSupplier) {
+  public FieldOrientedDrive() {
     this.translationXSupplier = Controls.getLeftXD1();
     this.translationYSupplier = Controls.getLeftYD1();
     this.rotationSupplier = Controls.getRightXD1();
@@ -32,8 +32,8 @@ public class FieldOrientedDrive extends CommandBase {
   public void execute() {
     m_SwerveDrive.setDesiredChassisSpeeds(
       ChassisSpeeds.fromFieldRelativeSpeeds(
-        MathUtil.applyDeadband(translationXSupplier.getAsDouble(), 0.2) * Constants.maxDriveVel,
         MathUtil.applyDeadband(translationYSupplier.getAsDouble(), 0.2) * Constants.maxDriveVel,
+        MathUtil.applyDeadband(translationXSupplier.getAsDouble(), 0.2) * Constants.maxDriveVel,
         MathUtil.applyDeadband(rotationSupplier.getAsDouble(), 0.2) * Constants.maxAngVel,
         m_SwerveDrive.getYawAngle()
       )

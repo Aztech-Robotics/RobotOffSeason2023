@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.sql.Time;
+
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
@@ -51,6 +53,7 @@ public class Drive extends SubsystemBase  {
   private boolean tagSearchActive = false;
   private boolean readyForCorrectionPose = false;
   private boolean orientModulesOnZero = false;
+  private Double time_update_mod = Double.NaN;
   
   private Drive() {
     modules[0] = new SwerveModule(
@@ -84,6 +87,7 @@ public class Drive extends SubsystemBase  {
     new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0), 
     new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0));
     motionPlanner = new DriveMotionPlanner();
+    yaw_gyro.calibrate();
     outputTelemetry();
   }
 
@@ -96,6 +100,9 @@ public class Drive extends SubsystemBase  {
 
   @Override
   public void periodic() {
+    if (time_update_mod.isNaN()){
+      time_update_mod = Timer.getFPGATimestamp();
+    }
     switch (swerveMode){
       case Nothing:
         if (RobotState.isEnabled()){
@@ -111,6 +118,12 @@ public class Drive extends SubsystemBase  {
       break; 
       case OpenLoop:
         double now = Timer.getFPGATimestamp();
+        if (now - time_update_mod >= 5){
+          for (SwerveModule swerveModule : modules){
+            swerveModule.setAngleCanCoderToPositionMotor();
+          }
+          time_update_mod = now;
+        }
         switch (swerveSubMode){
           case Trajectory:
           desiredChassisSpeeds = motionPlanner.update(getCurrentPose(), now); 
@@ -196,7 +209,7 @@ public class Drive extends SubsystemBase  {
   }
   
   public Rotation2d getPitchAngle (){
-    return null;
+    return new Rotation2d();
   }
   
   public Pose2d getCurrentPose (){
@@ -362,8 +375,8 @@ public class Drive extends SubsystemBase  {
     Telemetry.swerveTab.addDouble("Yaw Angle", () -> getYawAngle().getDegrees()).withPosition(8, 1); 
     Telemetry.swerveTab.addDouble("Pitch Angle", () -> getPitchAngle().getDegrees()).withPosition(9, 1);
     Telemetry.swerveTab.addBoolean("Odometry Reseted", () -> isReadyForAuto()).withPosition(0, 3);
-    Telemetry.swerveTab.addDouble("X Error", () -> motionPlanner.getTranslationalError(getCurrentPose(), Timer.getFPGATimestamp()).getX());
-    Telemetry.swerveTab.addDouble("Y Error", () -> motionPlanner.getTranslationalError(getCurrentPose(), Timer.getFPGATimestamp()).getY());
-    Telemetry.swerveTab.addDouble("Theta Error", () -> motionPlanner.getRotationalError(getYawAngle()).getDegrees());
+    Telemetry.swerveTab.addDouble("X Error", () -> motionPlanner.getTranslationalError(getCurrentPose(), Timer.getFPGATimestamp()).getX()).withPosition(1, 3);
+    Telemetry.swerveTab.addDouble("Y Error", () -> motionPlanner.getTranslationalError(getCurrentPose(), Timer.getFPGATimestamp()).getY()).withPosition(2, 3);
+    Telemetry.swerveTab.addDouble("Theta Error", () -> motionPlanner.getRotationalError(getYawAngle()).getDegrees()).withPosition(3, 3);
   }
 }

@@ -3,7 +3,6 @@ package frc.robot.modes;
 import java.util.Map;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Telemetry;
 import frc.robot.Constants.GameElement;
@@ -13,7 +12,9 @@ public class GamePieceMode extends SubsystemBase {
     private static GameElement activeMode;
     private boolean notifier = false;
 
-    private GamePieceMode (){}
+    private GamePieceMode (){
+        outputTelemetry();
+    }
 
     public static GamePieceMode getInstance (){
         if (generalMode == null){
@@ -48,7 +49,7 @@ public class GamePieceMode extends SubsystemBase {
                 if (activeMode == GameElement.Cone){
                     activeMode = GameElement.Cube;
                 }
-                else {
+               else {
                     activeMode = GameElement.Cone;
                 }
             }
@@ -66,13 +67,13 @@ public class GamePieceMode extends SubsystemBase {
     }
 
     public void outputTelemetry (){
-        // Telemetry.tabDriver.addBoolean("GamePiece", 
-        // () -> {
-        //     boolean value = false;
-        //     if (GamePieceMode.getInstance().getMode() == GameElement.Cone){
-        //         value = true;
-        //     }
-        //     return value;
-        // }).withSize(1, 1).withPosition(4, 3).withProperties(Map.of("Color when true","#ffff00","Color when false","#8066cc"));
+        Telemetry.driverTab.addBoolean("GamePiece", 
+        () -> {
+           boolean value = false;
+            if (GamePieceMode.getInstance().getMode() == GameElement.Cone){
+                value = true;
+            }
+            return value;
+        }).withSize(1, 1).withPosition(0, 0).withProperties(Map.of("Color when true","#ffff00","Color when false","#8066cc"));
     }
 }

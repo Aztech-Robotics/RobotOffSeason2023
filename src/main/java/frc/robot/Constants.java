@@ -53,9 +53,8 @@ public final class Constants {
   public static final double drive_gear_ratio = 6.75;
   public static final double steer_gear_ratio = 12.8;
   
-  public static final double maxDriveVel = ((max_rpm_neo / 60) / drive_gear_ratio) * Math.PI * wheelDiameter; 
-  public static final double maxSteerVel = ((max_rpm_neo / 60) / steer_gear_ratio) * Math.PI * wheelDiameter; 
-  public static final double maxAngVel = (maxDriveVel / (Math.PI * Math.hypot(trackWidth, wheelBase))) * 2 * Math.PI;   
+  public static final double maxDriveVel = 4.2; 
+  public static final double maxAngVel = 2 * Math.PI;   
 
   public static final double drivePositionCoefficient = (Math.PI * wheelDiameter) / drive_gear_ratio;
   public static final double driveVelocityCoefficient = drivePositionCoefficient / 60;
@@ -66,22 +65,22 @@ public final class Constants {
   public static final int id_speed_fLeft = 1;
   public static final int id_steer_fLeft = 2;
   public static final int id_canCoder_fLeft = 3;
-  public static final Rotation2d offset_fLeft = Rotation2d.fromDegrees(0);
+  public static final Rotation2d offset_fLeft = Rotation2d.fromDegrees(240);
 
   public static final int id_speed_fRight = 4;
   public static final int id_steer_fRight = 5;
   public static final int id_canCoder_fRight = 6;
-  public static final Rotation2d offset_fRight = Rotation2d.fromDegrees(0);
+  public static final Rotation2d offset_fRight = Rotation2d.fromDegrees(230);
 
   public static final int id_speed_bLeft = 7;
   public static final int id_steer_bLeft = 8;
   public static final int id_canCoder_bLeft = 9;
-  public static final Rotation2d offset_bLeft = Rotation2d.fromDegrees(0);
+  public static final Rotation2d offset_bLeft = Rotation2d.fromDegrees(5.8);
 
   public static final int id_speed_bRight = 10;
   public static final int id_steer_bRight = 11;
   public static final int id_canCoder_bRight = 12;
-  public static final Rotation2d offset_bRight = Rotation2d.fromDegrees(0); 
+  public static final Rotation2d offset_bRight = Rotation2d.fromDegrees(94); 
 
   public static final double kp_steerController = 0.8;
   public static final double ki_steerController = 0.0;
@@ -89,11 +88,11 @@ public final class Constants {
   public static final double kf_steerController = 0.0;
   public static final double kIz_steerController = 0.0;
 
-  public static final double kp_speedController = 0.0004;
-  public static final double ki_speedController = 0.00002;
-  public static final double kd_speedController = 0.0;
-  public static final double kf_speedController = 0.0;
-  public static final double kIz_speedController = 0.0;
+  public static final double kp_speedController = 0.008;
+  public static final double ki_speedController = 0;
+  public static final double kd_speedController = 0;
+  public static final double kf_speedController = 0;
+  public static final double kIz_speedController = 0;
   
   //Arm 
   public static final int id_arm_master = 13;
@@ -116,22 +115,22 @@ public final class Constants {
   //Intake
   public static final int id_intake = 18;
   
+  public static final CentripetalAccelerationConstraint cent_accel_traj = new CentripetalAccelerationConstraint(0);
   //Trajectories Paths
-  public static final String pathPickUp2ndPiece = "paths/PickUp2ndPiece.path";
-  public static final String pathDrop2ndPiece = "paths/Drop2ndPiece.path";
+  public static final String pathTest = "paths/PathTest.path";
 
-  public static final double kp_x = 0.0;
+  public static final double kp_x = 1.0;
   public static final double ki_x= 0.0;
   public static final double kd_x = 0.0;
 
-  public static final double kp_y = 0.0;
+  public static final double kp_y = 1.0;
   public static final double ki_y = 0.0;
   public static final double kd_y = 0.0;
   
-  public static final double kp_rot = 0.0;
+  public static final double kp_rot = 1.0;
   public static final double ki_rot = 0.0;
   public static final double kd_rot = 0.0;
-  public static final Constraints rot_constraints = new Constraints(0, 0);
+  public static final Constraints rot_constraints = new Constraints(maxAngVel, 0);
 
   public static final TrajectoryConfig getTrajConfig (double maxVel, double maxAccel, double startVel, double endVel){
     TrajectoryConfig config = new TrajectoryConfig(maxVel, maxAccel);

@@ -10,7 +10,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
-import frc.robot.Robot;
 
 public class DriveMotionPlanner {
     private final PIDController y_controller;
@@ -41,9 +40,6 @@ public class DriveMotionPlanner {
 
     public void setTargetRotation (Rotation2d target_rotation){
         this.target_rotation = target_rotation;
-        if (Robot.flip_alliance()){
-            this.target_rotation = Rotation2d.fromDegrees(180.0).rotateBy(this.target_rotation.unaryMinus());
-        }
     }
 
     public ChassisSpeeds update (Pose2d current_pose, double current_time){

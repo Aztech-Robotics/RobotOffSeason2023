@@ -33,7 +33,7 @@ public class WayPointReader {
                 }
                 controlVectors.add(new Spline.ControlVector(
                         new double[]{x, x_tan, 0},
-                        new double[]{Double.parseDouble(split[1]) + PATHWEAVER_Y_OFFSET, Double.parseDouble(split[3]), 0}));
+                        new double[]{Double.parseDouble(split[1]), Double.parseDouble(split[3]), 0}));
 
                 line = reader.readLine();
             }

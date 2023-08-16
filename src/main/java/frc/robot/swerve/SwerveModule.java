@@ -57,7 +57,7 @@ public class SwerveModule {
         controller_steerMotor.setPositionPIDWrappingEnabled(true);
         controller_steerMotor.setPositionPIDWrappingMinInput(0);
         controller_steerMotor.setPositionPIDWrappingMaxInput(Math.PI * 2);
-        controller_steerMotor.setSmartMotionAllowedClosedLoopError(1, 0); 
+        controller_steerMotor.setSmartMotionAllowedClosedLoopError(3, 0); 
 
         cancoder_steerMotor = new CANCoder(id_steerCanCoder);
         cancoder_steerMotor.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
@@ -70,12 +70,8 @@ public class SwerveModule {
         encoder_speedMotor.setPosition(0);
     }
     
-    public void voltageSpeedMotor (double output){
-        controller_speedMotor.setReference(output, CANSparkMax.ControlType.kDutyCycle);
-    }
-    
     public void velocitySpeedMotor (double velocity){
-        controller_speedMotor.setReference(velocity, CANSparkMax.ControlType.kVelocity); 
+        controller_speedMotor.setReference(velocity, CANSparkMax.ControlType.kDutyCycle); 
     }
     
     public double getVelocitySpeedMotor (){
@@ -170,5 +166,6 @@ public class SwerveModule {
         motorsData.addDouble("DSVel", ()->{return getDesiredModuleState().speedMetersPerSecond;});
         motorsData.addDouble("ModAngle", () -> {return getSteerMotorAngle().getDegrees();});
         motorsData.addDouble("DSAngle", ()->{return getDesiredModuleState().angle.getDegrees();});
+        motorsData.addDouble("CanCoderAngle", ()->{return getCanCoderAngle().getDegrees();});
     }
 }

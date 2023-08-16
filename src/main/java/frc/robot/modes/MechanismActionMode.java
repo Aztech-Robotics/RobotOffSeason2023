@@ -1,23 +1,23 @@
 package frc.robot.modes;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Telemetry;
 import frc.robot.Constants.MechanismMode;
 
 public class MechanismActionMode extends SubsystemBase {
     private static MechanismActionMode mechanismMode = null;
-    private static MechanismMode activeMode;
+    private static MechanismMode activeMode = MechanismMode.ManualMode;
     private boolean notifier = false;
-    private String value = "";
 
-    private MechanismActionMode (){}
+    private MechanismActionMode (){
+        outputTelemetry();
+    }
 
     public static MechanismActionMode getInstance (){
         if (mechanismMode == null){
             mechanismMode = new MechanismActionMode();
-            activeMode = MechanismMode.SaveMechanism;
+            activeMode = MechanismMode.ManualMode;
         }
         return mechanismMode;
     }
@@ -64,7 +64,8 @@ public class MechanismActionMode extends SubsystemBase {
         }
     }
 
-    public void outputTelemetry (){
+    public String getValue (){
+        String value = "";
         switch (activeMode){
             case ManualMode:
             value = "ManualMode";
@@ -79,6 +80,10 @@ public class MechanismActionMode extends SubsystemBase {
             value = "Score";
             break;
         }
-        //Telemetry.tabDriver.addString("Mechanism Mode", () -> {return value;}).withSize(1, 1).withPosition(4, 3);
+        return value;
+    }
+
+    public void outputTelemetry (){
+        Telemetry.driverTab.addString("Mechanism Mode", () -> {return getValue();}).withPosition(1, 0);
     }
 }
