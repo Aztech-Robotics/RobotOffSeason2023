@@ -10,7 +10,6 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.commands.FollowPath;
 import frc.robot.interfaces.AutoInterface;
-import frc.robot.subsystems.Drive;
 import frc.robot.utils.AutoTrajectoryReader;
 
 public class AutoTest implements AutoInterface {
@@ -18,11 +17,7 @@ public class AutoTest implements AutoInterface {
     private final FollowPath test_traj_com;
 
     public AutoTest (){
-        TrajectoryConfig config_test = new TrajectoryConfig(4.2, 4.0);
-        config_test.setStartVelocity(0);
-        config_test.setEndVelocity(0);
-        config_test.setKinematics(Drive.swerveDriveKinematics); 
-        config_test.addConstraint(Constants.cent_accel_traj);
+        TrajectoryConfig config_test = Constants.getTrajConfig(4.2, 4, 0, 0);
         test_traj = AutoTrajectoryReader.generateTrajectoryFromFile(Constants.pathTest, config_test);
         test_traj_com = new FollowPath(test_traj, Robot.flip_alliance() ? Rotation2d.fromDegrees(180) : Rotation2d.fromDegrees(0));
     }

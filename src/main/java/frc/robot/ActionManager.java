@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,6 +29,7 @@ public class ActionManager extends SubsystemBase {
     private Map<Integer, ActionInterface> stations_map;
     private List<Command> commandsAwait = new ArrayList<>();
     private int level, station;
+    private Command commandRunning;
 
     public ActionManager (){
         drive.setDefaultCommand(control_drive);
@@ -35,13 +37,52 @@ public class ActionManager extends SubsystemBase {
         stations_map = Map.of(1, new PickUpFloor(), 2, new PickUpSingle(), 3, new PickUpDouble());
         level = 1;
         station = 1;
+        commandRunning = null;
         outputTelemetry();
+    }
+
+    @Override
+    public void periodic (){
+        if (commandRunning != null){
+            if (!commandRunning.isScheduled()){
+                commandRunning.schedule();
+            } else {
+                if (commandRunning.isFinished()){
+                    commandRunning = null;
+                }
+            }
+        }
     }
 
     public Command requestAction (){
         return runOnce(
             () -> {
-                
+                if (commandRunning != null){
+                    DriverStation.reportError("A command is already running. Cancel the action!!", false);
+                } 
+                else {
+                    if (!commandsAwait.isEmpty()){
+                        commandRunning = commandsAwait.get(0);
+                        commandsAwait.remove(0);
+                    }
+                    else {
+                        switch (mechanismActionMode.getMode()){
+                            case ManualMode:
+                            commandRunning = ActionsSet.manual_mode;
+                            break;
+                            case SaveMechanism:
+                            commandRunning = ActionsSet.save_mechanism;
+                            break;
+                            case PickUp:
+                            commandRunning = stations_map.get(station).getActionCommand();
+                            break;
+                            case Score:
+                            commandRunning = ActionsSet.prepare_high_pos;
+                            commandsAwait.add(scores_map.get(level).getActionCommand());
+                            break;
+                        }
+                    }
+                }
             }
         );
     }
@@ -49,7 +90,11 @@ public class ActionManager extends SubsystemBase {
     public Command requestCancelAction (){
         return runOnce(
             () -> {
-
+                if (commandRunning != null){
+                    commandRunning.cancel();
+                    commandRunning = null;
+                }
+                commandsAwait.clear();
             }
         );
     }

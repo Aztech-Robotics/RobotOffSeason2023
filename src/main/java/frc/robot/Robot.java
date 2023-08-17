@@ -19,7 +19,6 @@ public class Robot extends TimedRobot {
   private MechanismActionMode mechanismMode;
   private Drive drive  = Drive.getInstance();
   private Command autonomousCommand;
-  private EventLoop loop = new EventLoop();
   
   public static boolean flip_alliance (){
     return DriverStation.getAlliance() == Alliance.Red ? true : false;
@@ -43,12 +42,12 @@ public class Robot extends TimedRobot {
     Controls.driver2.povDown().onTrue(actionManager.moveLevel(-1));
     Controls.driver2.povRight().onTrue(actionManager.moveStation(1));
     Controls.driver2.povLeft().onTrue(actionManager.moveStation(-1));
+
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    loop.poll();
   }
 
   @Override
@@ -75,6 +74,7 @@ public class Robot extends TimedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    drive.orientModules();
   }
 
   @Override

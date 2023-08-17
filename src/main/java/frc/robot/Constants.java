@@ -130,13 +130,13 @@ public final class Constants {
   public static final double kp_rot = 1.0;
   public static final double ki_rot = 0.0;
   public static final double kd_rot = 0.0;
-  public static final Constraints rot_constraints = new Constraints(maxAngVel, 0);
+  public static final Constraints rot_constraints = new Constraints(maxAngVel, Math.pow(maxAngVel, 2));
 
   public static final TrajectoryConfig getTrajConfig (double maxVel, double maxAccel, double startVel, double endVel){
     TrajectoryConfig config = new TrajectoryConfig(maxVel, maxAccel);
     config.setStartVelocity(startVel);
     config.setEndVelocity(endVel);
-    config.addConstraint(new CentripetalAccelerationConstraint(0)); 
+    config.addConstraint(new CentripetalAccelerationConstraint(9)); 
     return config;
   }
 
