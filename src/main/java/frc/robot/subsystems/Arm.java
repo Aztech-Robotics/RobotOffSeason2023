@@ -18,12 +18,16 @@ import frc.robot.Telemetry;
 
 public class Arm extends SubsystemBase {
   private static Arm arm;
+  /*
   private final TalonFX arm_master = new TalonFX(Constants.id_arm_master);
   private final TalonFX arm_sleeve = new TalonFX(Constants.id_arm_sleeve);
   private final TalonFXConfiguration config = new TalonFXConfiguration();
+  
+   */
   private Rotation2d targetAngle = null;
   private boolean isAtTarget = false;
   private Arm() {
+    /*
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.CurrentLimits.StatorCurrentLimit = 80.0;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -42,6 +46,8 @@ public class Arm extends SubsystemBase {
     config.Slot0.kV = Constants.kv_arm;
     arm_master.getConfigurator().apply(config);
     arm_sleeve.getConfigurator().apply(config);
+    
+     */
     setNeutralMode(NeutralModeValue.Coast);
     outputTelemetry();
   }
@@ -55,26 +61,32 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
+    /*
     if (targetAngle != null && Math.abs(arm_master.getClosedLoopError().getValue()) < 1){
       isAtTarget = true;
       targetAngle = null; 
     }
+     */
   }
 
   public void setAngle (Rotation2d angle){
+    /*
     PositionDutyCycle requestMaster = new PositionDutyCycle(angle.getRotations(), true, Constants.ff_arm, 0, true);
     Follower requestSleeve = new Follower(arm_master.getDeviceID(), true);
     arm_master.setControl(requestMaster);
     arm_sleeve.setControl(requestSleeve);
+     */
     targetAngle = angle;
     isAtTarget = false;
   }
 
   public void setVelocity (double output){
+    /*
     DutyCycleOut requestVel = new DutyCycleOut(output);
     arm_master.setControl(requestVel);  
     Follower requestSleeve = new Follower(arm_master.getDeviceID(), true);
     arm_sleeve.setControl(requestSleeve);
+     */
   }
 
   public boolean isAtTargetPosition () {
@@ -82,15 +94,19 @@ public class Arm extends SubsystemBase {
   }
 
   public void setNeutralMode (NeutralModeValue mode){
+    /*
     MotorOutputConfigs config = new MotorOutputConfigs();
     config.NeutralMode = mode;
     arm_master.getConfigurator().apply(config);
     arm_sleeve.getConfigurator().apply(config);
+     */
   }
 
   public void outputTelemetry (){
+    /*
     Telemetry.mechanismTab.addDouble("Arm Angle ", () -> Rotation2d.fromRotations(arm_master.getPosition().getValue()).getDegrees());
     Telemetry.mechanismTab.addBoolean("Arm FLimit", () -> arm_master.getForwardLimit().getValue() == ForwardLimitValue.Open ? true : false);
     Telemetry.mechanismTab.addBoolean("Arm RLimit", () -> arm_master.getReverseLimit().getValue() == ReverseLimitValue.Open ? true : false);
+     */
   }
 }

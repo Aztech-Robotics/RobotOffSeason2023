@@ -1,13 +1,11 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class TestCommand extends CommandBase {
-  String message;
-  ShuffleboardTab tabDrive = Shuffleboard.getTab("DriveData");
+  String message, updateMessage = "";
   boolean flag = false;
   double startTime, duration;
   public TestCommand (String message, double duration) {
@@ -19,7 +17,6 @@ public class TestCommand extends CommandBase {
   public void initialize() {
     flag = false;
     startTime = Timer.getFPGATimestamp();
-    tabDrive.addString("Test Command Running " + message, ()->{return ("Seconds: " + getSeconds());});
   }
 
   @Override
@@ -27,6 +24,8 @@ public class TestCommand extends CommandBase {
     if (getSeconds() >= duration){
       flag = true;
     }
+    updateMessage = "Seconds" + getSeconds();
+    SmartDashboard.putString("Running " + message, updateMessage);
   }
 
   @Override

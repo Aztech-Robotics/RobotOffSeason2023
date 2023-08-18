@@ -1,10 +1,8 @@
 package frc.robot;
 
-import edu.wpi.first.util.concurrent.Event;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.MechanismMode;
@@ -42,7 +40,8 @@ public class Robot extends TimedRobot {
     Controls.driver2.povDown().onTrue(actionManager.moveLevel(-1));
     Controls.driver2.povRight().onTrue(actionManager.moveStation(1));
     Controls.driver2.povLeft().onTrue(actionManager.moveStation(-1));
-
+    Controls.driver2.rightBumper().onTrue(actionManager.requestAction());
+    Controls.driver2.leftBumper().onTrue(actionManager.requestCancelAction());
   }
 
   @Override

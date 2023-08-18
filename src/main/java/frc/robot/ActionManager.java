@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -33,8 +34,8 @@ public class ActionManager extends SubsystemBase {
 
     public ActionManager (){
         drive.setDefaultCommand(control_drive);
-        scores_map = Map.of(1, new ScoreBottom(), 2, new ScoreMiddle(), 3, new ScoreTop());
-        stations_map = Map.of(1, new PickUpFloor(), 2, new PickUpSingle(), 3, new PickUpDouble());
+        scores_map = Map.of(1, ActionsSet.score_bottom, 2, ActionsSet.score_middle, 3, ActionsSet.score_top);
+        stations_map = Map.of(1, ActionsSet.pickup_floor, 2, ActionsSet.pickup_single, 3, ActionsSet.pickup_double);
         level = 1;
         station = 1;
         commandRunning = null;
@@ -44,12 +45,9 @@ public class ActionManager extends SubsystemBase {
     @Override
     public void periodic (){
         if (commandRunning != null){
-            if (!commandRunning.isScheduled()){
-                commandRunning.schedule();
-            } else {
-                if (commandRunning.isFinished()){
-                    commandRunning = null;
-                }
+            SmartDashboard.putBoolean("Running", commandRunning.isFinished());
+            if (commandRunning.isFinished()){
+                commandRunning = null;
             }
         }
     }
@@ -57,31 +55,29 @@ public class ActionManager extends SubsystemBase {
     public Command requestAction (){
         return runOnce(
             () -> {
-                if (commandRunning != null){
-                    DriverStation.reportError("A command is already running. Cancel the action!!", false);
-                } 
+                if (!commandsAwait.isEmpty()){
+                    commandRunning = commandsAwait.get(0);
+                    commandsAwait.remove(0);
+                }
                 else {
-                    if (!commandsAwait.isEmpty()){
-                        commandRunning = commandsAwait.get(0);
-                        commandsAwait.remove(0);
+                    switch (mechanismActionMode.getMode()){
+                        case ManualMode:
+                        commandRunning = ActionsSet.manual_mode;
+                        break;
+                        case SaveMechanism:
+                        commandRunning = ActionsSet.save_mechanism;
+                        break;
+                        case PickUp:
+                        commandRunning = stations_map.get(station).getActionCommand();
+                        break;
+                        case Score:
+                        commandRunning = ActionsSet.prepare_high_pos;
+                        commandsAwait.add(scores_map.get(level).getActionCommand());
+                        break;
                     }
-                    else {
-                        switch (mechanismActionMode.getMode()){
-                            case ManualMode:
-                            commandRunning = ActionsSet.manual_mode;
-                            break;
-                            case SaveMechanism:
-                            commandRunning = ActionsSet.save_mechanism;
-                            break;
-                            case PickUp:
-                            commandRunning = stations_map.get(station).getActionCommand();
-                            break;
-                            case Score:
-                            commandRunning = ActionsSet.prepare_high_pos;
-                            commandsAwait.add(scores_map.get(level).getActionCommand());
-                            break;
-                        }
-                    }
+                }
+                if (commandRunning != null){
+                    commandRunning.schedule();
                 }
             }
         );
