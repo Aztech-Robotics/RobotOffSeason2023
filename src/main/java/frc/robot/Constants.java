@@ -53,8 +53,8 @@ public final class Constants {
   public static final double drive_gear_ratio = 6.75;
   public static final double steer_gear_ratio = 12.8;
   
-  public static final double maxDriveVel = 4.2; 
-  public static final double maxAngVel = 2 * Math.PI;   
+  public static final double maxDriveVel = 4.4; 
+  public static final double maxAngVel = Math.PI;   
 
   public static final double drivePositionCoefficient = (Math.PI * wheelDiameter) / drive_gear_ratio;
   public static final double driveVelocityCoefficient = drivePositionCoefficient / 60;
@@ -117,26 +117,30 @@ public final class Constants {
   
   public static final CentripetalAccelerationConstraint cent_accel_traj = new CentripetalAccelerationConstraint(0);
   //Trajectories Paths
-  public static final String pathTest = "paths/PathTest.path";
+  public static final String auto1Path1 = "paths/Auto1Path1.path";
+  public static final String auto1Path2 = "paths/Auto1Path2.path";
+  public static final String auto1Path3 = "paths/Auto1Path3.path";
+  public static final String auto1Path4 = "paths/Auto1Path4.path";
 
-  public static final double kp_x = 1.0;
+
+  public static final double kp_x = 1;
   public static final double ki_x= 0.0;
   public static final double kd_x = 0.0;
 
-  public static final double kp_y = 1.0;
+  public static final double kp_y = 1;
   public static final double ki_y = 0.0;
   public static final double kd_y = 0.0;
   
-  public static final double kp_rot = 1.0;
+  public static final double kp_rot = 2;
   public static final double ki_rot = 0.0;
   public static final double kd_rot = 0.0;
   public static final Constraints rot_constraints = new Constraints(maxAngVel, Math.pow(maxAngVel, 2));
 
-  public static final TrajectoryConfig getTrajConfig (double maxVel, double maxAccel, double startVel, double endVel){
+  public static TrajectoryConfig getTrajConfig (double maxVel, double maxAccel, double startVel, double endVel){
     TrajectoryConfig config = new TrajectoryConfig(maxVel, maxAccel);
     config.setStartVelocity(startVel);
     config.setEndVelocity(endVel);
-    config.addConstraint(new CentripetalAccelerationConstraint(9)); 
+    config.addConstraint(new CentripetalAccelerationConstraint(Math.PI)); 
     return config;
   }
 

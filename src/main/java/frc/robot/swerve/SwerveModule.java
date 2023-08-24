@@ -42,8 +42,8 @@ public class SwerveModule {
         controller_speedMotor.setIZone(Constants.kIz_speedController, 0);
 
         steerMotor = new CANSparkMax(id_steerMotor, MotorType.kBrushless);
-        steerMotor.setSmartCurrentLimit(50);
-        speedMotor.setSmartCurrentLimit(50);
+        steerMotor.setSmartCurrentLimit(40);
+        speedMotor.setSmartCurrentLimit(40);
         encoder_steerMotor = steerMotor.getEncoder();
         encoder_steerMotor.setPositionConversionFactor(Constants.steerPositionCoefficient);
         encoder_steerMotor.setVelocityConversionFactor(Constants.steerVelocityCoefficient);

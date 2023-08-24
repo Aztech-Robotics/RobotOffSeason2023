@@ -73,7 +73,6 @@ public class Robot extends TimedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    drive.orientModules();
   }
 
   @Override

@@ -36,6 +36,7 @@ public class DriveMotionPlanner {
         start_time = Double.NaN;
         setTargetRotation(heading);
         isTrajectoryFinished = false; 
+        current_trajectory = trajectory;
     }
 
     public void setTargetRotation (Rotation2d target_rotation){

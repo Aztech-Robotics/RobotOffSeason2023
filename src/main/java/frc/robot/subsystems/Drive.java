@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
@@ -17,6 +20,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
@@ -135,10 +139,10 @@ public class Drive extends SubsystemBase  {
         if (desiredChassisSpeeds != null) {
           SwerveModuleState[] modules_states = new SwerveModuleState[4]; 
           if (orientModulesOnZero && desiredChassisSpeeds.vxMetersPerSecond == 0 && desiredChassisSpeeds.vyMetersPerSecond == 0 && desiredChassisSpeeds.omegaRadiansPerSecond == 0){
-            modules_states[0] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
-            modules_states[1] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
-            modules_states[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
-            modules_states[3] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+            modules_states[0] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
+            modules_states[1] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+            modules_states[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+            modules_states[3] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
           }
           else {
             modules_states = swerveDriveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
@@ -245,6 +249,19 @@ public class Drive extends SubsystemBase  {
     } else {
       swerveDrivePoseEstimator.update(getYawAngle(), getModulesPosition());
     }
+  }
+
+  public Command getPathFollowingCommand (PathPlannerTrajectory trajectory){
+    return new PPSwerveControllerCommand(
+      trajectory, 
+      this::getCurrentPose, 
+      swerveDriveKinematics, 
+      new PIDController(0, 0, 0), 
+      new PIDController(0, 0, 0), 
+      new PIDController(0, 0, 0), 
+      this::setModulesStates, 
+      true, 
+      this);
   }
 
   public void setTrajectory (Trajectory trajectory, Rotation2d target_rotation){
