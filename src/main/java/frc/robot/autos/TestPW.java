@@ -17,7 +17,7 @@ public class TestPW implements AutoInterface {
     private final FollowPath test_traj_com;
 
     public TestPW (){
-        TrajectoryConfig config_test = Constants.getTrajConfig(4.2, 4, 0, 0);
+        TrajectoryConfig config_test = Constants.getTrajConfig(2, 1, 0, 0);
         test_traj = AutoTrajectoryReader.generateTrajectoryFromFile(Constants.pathTest, config_test);
         test_traj_com = new FollowPath(test_traj, Robot.flip_alliance() ? Rotation2d.fromDegrees(180) : Rotation2d.fromDegrees(0));
     }

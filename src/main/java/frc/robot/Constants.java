@@ -117,7 +117,7 @@ public final class Constants {
   
   public static final CentripetalAccelerationConstraint cent_accel_traj = new CentripetalAccelerationConstraint(0);
   //Trajectories Paths
-  public static final String pathTest = "paths/Auto1Path1.path";
+  public static final String pathTest = "paths/TrajTest.path";
   public static final String auto1Path2 = "paths/Auto1Path2.path";
   public static final String auto1Path3 = "paths/Auto1Path3.path";
   public static final String auto1Path4 = "paths/Auto1Path4.path";
@@ -131,7 +131,7 @@ public final class Constants {
   public static final double ki_y = 0.0;
   public static final double kd_y = 0.0;
   
-  public static final double kp_rot = 2;
+  public static final double kp_rot = 1;
   public static final double ki_rot = 0.0;
   public static final double kd_rot = 0.0;
   public static final Constraints rot_constraints = new Constraints(maxAngVel, Math.pow(maxAngVel, 2));
