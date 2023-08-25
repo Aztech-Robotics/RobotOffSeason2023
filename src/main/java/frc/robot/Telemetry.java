@@ -3,7 +3,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.autos.AutoCS;
+import frc.robot.autos.TestPW;
+import frc.robot.autos.TestPP;
 import frc.robot.interfaces.AutoInterface;
 
 public class Telemetry {
@@ -13,9 +14,11 @@ public class Telemetry {
   public static SendableChooser<AutoInterface> auto_chooser = new SendableChooser<>();
 
   public static void displayAutos() {
-    AutoCS autoTest = new AutoCS();
+    TestPP autoComm = new TestPP();
+    TestPW autoCS = new TestPW();
     auto_chooser.setDefaultOption("None ", null);
-    auto_chooser.addOption("AutoTest", autoTest); 
+    auto_chooser.addOption("AutoComm", autoComm); 
+    auto_chooser.addOption("AutoCS", autoCS); 
     driverTab.add(auto_chooser).withSize(2, 1).withPosition(4, 0);
   }
 }

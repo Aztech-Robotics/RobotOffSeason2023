@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.MatBuilder;
@@ -21,6 +23,7 @@ import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
@@ -56,6 +59,7 @@ public class Drive extends SubsystemBase  {
   private boolean readyForCorrectionPose = false;
   private boolean orientModulesOnZero = false;
   private Double time_update_mod = Double.NaN;
+  private SwerveAutoBuilder autoBuilder;
   
   private Drive() {
     modules[0] = new SwerveModule(
@@ -82,13 +86,21 @@ public class Drive extends SubsystemBase  {
       Constants.id_canCoder_bRight, 
       Constants.offset_bRight
     ); 
-    swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(swerveDriveKinematics, 
-    getYawAngle(), 
-    getModulesPosition(), 
-    new Pose2d(), 
+    swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(swerveDriveKinematics, getYawAngle(), getModulesPosition(), new Pose2d(), 
     new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0), 
     new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0));
     motionPlanner = new DriveMotionPlanner();
+    autoBuilder = new SwerveAutoBuilder(
+      this::getCurrentPose, 
+      this::setCurrentPose, 
+      swerveDriveKinematics, 
+      new PIDConstants(5, 0, 0), 
+      new PIDConstants(0, 0, 0), 
+      this::setModulesStates, 
+      null, 
+      true, 
+      this
+    );
     yaw_gyro.calibrate();
     outputTelemetry();
   }
@@ -236,32 +248,40 @@ public class Drive extends SubsystemBase  {
     setCurrentPose(starting_pose);
   }
 
+  public CommandBase resetGyroComm (){
+    return runOnce(
+      () -> {
+        resetYawAngle();
+      }
+    );
+  }
+
   public void setDesiredChassisSpeeds (ChassisSpeeds chassisSpeeds){
     desiredChassisSpeeds = chassisSpeeds;
   }
   
   public void updateOdometry (){
+    swerveDrivePoseEstimator.update(getYawAngle(), getModulesPosition());
+    /*
     if (vision.sawTag()){
       if (tagSearchActive){
         readyForCorrectionPose = true;
       }
       swerveDrivePoseEstimator.addVisionMeasurement(vision.getBotPose(), Timer.getFPGATimestamp() - (vision.getLatencyPipeline()/1000.0) - (vision.getLatencyCapture()/1000.0));
     } else {
-      swerveDrivePoseEstimator.update(getYawAngle(), getModulesPosition());
     }
+     */
   }
 
   public Command getPathFollowingCommand (PathPlannerTrajectory trajectory){
     return new PPSwerveControllerCommand(
       trajectory, 
       this::getCurrentPose, 
-      swerveDriveKinematics, 
-      new PIDController(0, 0, 0), 
-      new PIDController(0, 0, 0), 
-      new PIDController(0, 0, 0), 
-      this::setModulesStates, 
-      true, 
-      this);
+      new PIDController(0.2, 0, 0), 
+      new PIDController(0.2, 0, 0),
+      new PIDController(0.2, 0, 0), 
+      this::setDesiredChassisSpeeds, true, this
+    );
   }
 
   public void setTrajectory (Trajectory trajectory, Rotation2d target_rotation){

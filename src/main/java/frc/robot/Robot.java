@@ -32,6 +32,7 @@ public class Robot extends TimedRobot {
   }
 
   public void teleopBindings (){
+    Controls.driver1.leftBumper().onTrue(drive.resetGyroComm());
     Controls.driver2.a().onTrue(gamePieceMode.toggleMode());
     Controls.driver2.b().onTrue(mechanismMode.toggleDriverMode());
     Controls.driver2.x().onTrue(mechanismMode.commandSetMode(MechanismMode.ManualMode));
