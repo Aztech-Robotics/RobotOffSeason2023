@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -49,6 +50,7 @@ public class Drive extends SubsystemBase  {
   private ADXRS450_Gyro yaw_gyro = new ADXRS450_Gyro();
   private Vision vision = Vision.getInstance();
   private SwerveDrivePoseEstimator swerveDrivePoseEstimator;
+  private SwerveDriveOdometry swerveDriveOdometry;
   private DriveMotionPlanner motionPlanner;
   private ChassisSpeeds desiredChassisSpeeds;
   private SwerveMode swerveMode = SwerveMode.Nothing;
@@ -89,13 +91,14 @@ public class Drive extends SubsystemBase  {
     swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(swerveDriveKinematics, getYawAngle(), getModulesPosition(), new Pose2d(), 
     new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0), 
     new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0));
+    swerveDriveOdometry = new SwerveDriveOdometry(swerveDriveKinematics, getYawAngle(), getModulesPosition());
     motionPlanner = new DriveMotionPlanner();
     autoBuilder = new SwerveAutoBuilder(
       this::getCurrentPose, 
       this::setCurrentPose, 
       swerveDriveKinematics, 
       new PIDConstants(5, 0, 0), 
-      new PIDConstants(0, 0, 0), 
+      new PIDConstants(0.25, 0, 0.01), 
       this::setModulesStates, 
       null, 
       true, 
@@ -274,14 +277,7 @@ public class Drive extends SubsystemBase  {
   }
 
   public Command getPathFollowingCommand (PathPlannerTrajectory trajectory){
-    return new PPSwerveControllerCommand(
-      trajectory, 
-      this::getCurrentPose, 
-      new PIDController(0.2, 0, 0), 
-      new PIDController(0.2, 0, 0),
-      new PIDController(0.2, 0, 0), 
-      this::setDesiredChassisSpeeds, true, this
-    );
+    return autoBuilder.followPathWithEvents(trajectory);
   }
 
   public void setTrajectory (Trajectory trajectory, Rotation2d target_rotation){

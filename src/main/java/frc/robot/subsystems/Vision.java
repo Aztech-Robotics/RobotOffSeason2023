@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.Telemetry;
 import frc.robot.Constants.TypePipeline;
 import frc.robot.utils.LimelightHelpers;
 
@@ -8,7 +9,9 @@ public class Vision {
   private static Vision limelight;
   private TypePipeline activePipeline;
 
-  private Vision() {}
+  private Vision() {
+    //Telemetry.driverTab.addCamera("Limelight", "Limelight", getURL()).withSize(4, 4).withPosition(0, 0);
+  }
 
   public static Vision getInstance (){
     if (limelight == null){

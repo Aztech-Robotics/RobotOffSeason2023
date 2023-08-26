@@ -84,6 +84,6 @@ public class MechanismActionMode extends SubsystemBase {
     }
 
     public void outputTelemetry (){
-        Telemetry.driverTab.addString("Mechanism Mode", () -> {return getValue();}).withPosition(1, 0);
+        Telemetry.driverTab.addString("Mechanism Mode", () -> {return getValue();}).withPosition(5, 0);
     }
 }

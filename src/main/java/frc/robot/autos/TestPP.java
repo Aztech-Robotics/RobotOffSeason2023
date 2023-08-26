@@ -12,21 +12,21 @@ import frc.robot.subsystems.Drive;
 
 public class TestPP implements AutoInterface {
     private final Drive drive = Drive.getInstance();
-    private final PathPlannerTrajectory traj1;
+    private final PathPlannerTrajectory test_traj;
+    private final Command test_traj_comm;
 
     public TestPP (){
-        traj1 = PathPlanner.loadPath("TestTraj", new PathConstraints(3, 3));
+        test_traj = PathPlanner.loadPath("AutoDPath1", new PathConstraints(2, 1));
+        test_traj_comm = drive.getPathFollowingCommand(test_traj);
     }
 
     @Override
     public Command getAutoCommand (){
-        return new SequentialCommandGroup(
-            drive.getPathFollowingCommand(traj1)
-        );
+        return test_traj_comm;
     }
 
     @Override
     public Pose2d getStartingPose (){
-        return traj1.getInitialHolonomicPose();
+        return test_traj.getInitialHolonomicPose();
     }
 }

@@ -19,21 +19,19 @@ public class TestPW implements AutoInterface {
     public TestPW (){
         TrajectoryConfig config_test = Constants.getTrajConfig(2, 1, 0, 0);
         test_traj = AutoTrajectoryReader.generateTrajectoryFromFile(Constants.pathTest, config_test);
-        test_traj_com = new FollowPath(test_traj, Robot.flip_alliance() ? Rotation2d.fromDegrees(180) : Rotation2d.fromDegrees(0));
+        test_traj_com = new FollowPath(test_traj, Rotation2d.fromDegrees(-90));
     }
 
     @Override
     public Command getAutoCommand (){
-        return new SequentialCommandGroup(
-            test_traj_com
-        );
+        return test_traj_com;
     }
 
     @Override
     public Pose2d getStartingPose (){
         return new Pose2d(
             test_traj.getInitialPose().getTranslation(), 
-            Robot.flip_alliance() ? Rotation2d.fromDegrees(0) : Rotation2d.fromDegrees(180)
+            Rotation2d.fromDegrees(0)
         );
     }
 }

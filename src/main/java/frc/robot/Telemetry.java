@@ -14,11 +14,11 @@ public class Telemetry {
   public static SendableChooser<AutoInterface> auto_chooser = new SendableChooser<>();
 
   public static void displayAutos() {
-    TestPP autoComm = new TestPP();
-    TestPW autoCS = new TestPW();
+    TestPP testPP = new TestPP();
+    TestPW testPW = new TestPW();
     auto_chooser.setDefaultOption("None ", null);
-    auto_chooser.addOption("AutoComm", autoComm); 
-    auto_chooser.addOption("AutoCS", autoCS); 
-    driverTab.add(auto_chooser).withSize(2, 1).withPosition(4, 0);
+    auto_chooser.addOption("TestPP", testPP); 
+    auto_chooser.addOption("TestPW", testPW); 
+    driverTab.add(auto_chooser).withSize(2, 1).withPosition(4, 1);
   }
 }

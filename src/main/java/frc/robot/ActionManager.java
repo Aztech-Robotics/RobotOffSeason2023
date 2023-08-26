@@ -131,7 +131,7 @@ public class ActionManager extends SubsystemBase {
                 break;
             }
             return value;
-        }).withPosition(2, 0);
+        }).withPosition(6, 0);
         Telemetry.driverTab.addString("Station", 
         () -> {
             String value = "";
@@ -147,6 +147,6 @@ public class ActionManager extends SubsystemBase {
                 break;
             }
             return value;
-        }).withPosition(3, 0);
+        }).withPosition(7, 0);
     }
 }

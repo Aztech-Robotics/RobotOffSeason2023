@@ -74,6 +74,6 @@ public class GamePieceMode extends SubsystemBase {
                 value = true;
             }
             return value;
-        }).withSize(1, 1).withPosition(0, 0).withProperties(Map.of("Color when true","#ffff00","Color when false","#8066cc"));
+        }).withSize(1, 1).withPosition(4, 0).withProperties(Map.of("Color when true","#ffff00","Color when false","#8066cc"));
     }
 }

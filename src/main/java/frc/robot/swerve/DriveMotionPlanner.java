@@ -9,7 +9,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.Telemetry;
 
 public class DriveMotionPlanner {
     private final PIDController y_controller;
@@ -27,12 +29,14 @@ public class DriveMotionPlanner {
         rotation_controller = new ProfiledPIDController(Constants.kp_rot, Constants.ki_rot, Constants.kd_rot, Constants.rot_constraints);
         rotation_controller.enableContinuousInput(0, 2 * Math.PI);
         drive_controller = new HolonomicDriveController(y_controller, x_controller, rotation_controller);
+        Telemetry.swerveTab.addBoolean("TrajectoryIsFinished", () -> isTrajectoryFinished); 
     }
 
     public void setTrajectory (Trajectory trajectory, Rotation2d heading, Pose2d current_pose){
         x_controller.reset();
         y_controller.reset();
         rotation_controller.reset(current_pose.getRotation().getRadians());
+        rotation_controller.setTolerance(0.15);
         start_time = Double.NaN;
         setTargetRotation(heading);
         isTrajectoryFinished = false; 
@@ -50,15 +54,18 @@ public class DriveMotionPlanner {
                 start_time = Timer.getFPGATimestamp();
             }
             double seconds = current_time - start_time;
+            SmartDashboard.putNumber("TrajTime", seconds);
+            SmartDashboard.putNumber("Running Traj of ", current_trajectory.getTotalTimeSeconds());
             Trajectory.State desired_state;
             if (seconds < current_trajectory.getTotalTimeSeconds()){
                 desired_state = current_trajectory.sample(seconds);
+                desired_ChassisSpeeds = drive_controller.calculate(current_pose, desired_state, target_rotation);
             } else {
                 isTrajectoryFinished = true;
                 desired_state = current_trajectory.sample(current_trajectory.getTotalTimeSeconds());
                 current_trajectory = null;
+                desired_ChassisSpeeds = new ChassisSpeeds();
             }
-            desired_ChassisSpeeds = drive_controller.calculate(current_pose, desired_state, target_rotation);
         } else {
             desired_ChassisSpeeds = null; 
         }
@@ -83,6 +90,6 @@ public class DriveMotionPlanner {
     }
 
     public boolean isTrajectoryFinished() {
-        return current_trajectory != null && isTrajectoryFinished;
+        return isTrajectoryFinished;
     }
 }
