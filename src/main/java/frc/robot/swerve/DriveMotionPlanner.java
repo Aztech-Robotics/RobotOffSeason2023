@@ -28,19 +28,19 @@ public class DriveMotionPlanner {
         y_controller = new PIDController(Constants.kp_y, Constants.ki_y, Constants.kd_y);
         rotation_controller = new ProfiledPIDController(Constants.kp_rot, Constants.ki_rot, Constants.kd_rot, Constants.rot_constraints);
         rotation_controller.enableContinuousInput(0, 2 * Math.PI);
+        rotation_controller.setTolerance(0.15);
         drive_controller = new HolonomicDriveController(y_controller, x_controller, rotation_controller);
         Telemetry.swerveTab.addBoolean("TrajectoryIsFinished", () -> isTrajectoryFinished); 
     }
 
     public void setTrajectory (Trajectory trajectory, Rotation2d heading, Pose2d current_pose){
+        current_trajectory = trajectory;
+        isTrajectoryFinished = false; 
+        setTargetRotation(heading);
+        start_time = Double.NaN;
         x_controller.reset();
         y_controller.reset();
         rotation_controller.reset(current_pose.getRotation().getRadians());
-        rotation_controller.setTolerance(0.15);
-        start_time = Double.NaN;
-        setTargetRotation(heading);
-        isTrajectoryFinished = false; 
-        current_trajectory = trajectory;
     }
 
     public void setTargetRotation (Rotation2d target_rotation){
@@ -48,7 +48,7 @@ public class DriveMotionPlanner {
     }
 
     public ChassisSpeeds update (Pose2d current_pose, double current_time){
-        ChassisSpeeds desired_ChassisSpeeds;
+        ChassisSpeeds desired_ChassisSpeeds = null;
         if (current_trajectory != null){
             if (start_time.isNaN()){
                 start_time = Timer.getFPGATimestamp();
@@ -62,13 +62,10 @@ public class DriveMotionPlanner {
                 desired_ChassisSpeeds = drive_controller.calculate(current_pose, desired_state, target_rotation);
             } else {
                 isTrajectoryFinished = true;
-                desired_state = current_trajectory.sample(current_trajectory.getTotalTimeSeconds());
                 current_trajectory = null;
                 desired_ChassisSpeeds = new ChassisSpeeds();
             }
-        } else {
-            desired_ChassisSpeeds = null; 
-        }
+        } 
         return desired_ChassisSpeeds;
     }
 

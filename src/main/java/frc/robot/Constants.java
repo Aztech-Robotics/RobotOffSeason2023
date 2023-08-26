@@ -117,10 +117,10 @@ public final class Constants {
   
   public static final CentripetalAccelerationConstraint cent_accel_traj = new CentripetalAccelerationConstraint(0);
   //Trajectories Paths
-  public static final String pathTest = "paths/TrajTest.path";
-  public static final String auto1Path2 = "paths/Auto1Path2.path";
-  public static final String auto1Path3 = "paths/Auto1Path3.path";
-  public static final String auto1Path4 = "paths/Auto1Path4.path";
+  public static final String autoDPath1 = "paths/AutoDPath1.path";
+  public static final String autoDPath2 = "paths/AutoDPath2.path";
+  public static final String pathOutOfComm = "paths/PathOutOfComm.path";
+  public static final String pathToCS = "paths/PathToCS.path";
 
 
   public static final double kp_x = 1;

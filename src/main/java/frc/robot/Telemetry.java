@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.autos.TestPW;
-import frc.robot.autos.TestPP;
 import frc.robot.interfaces.AutoInterface;
 
 public class Telemetry {
@@ -14,10 +13,8 @@ public class Telemetry {
   public static SendableChooser<AutoInterface> auto_chooser = new SendableChooser<>();
 
   public static void displayAutos() {
-    TestPP testPP = new TestPP();
     TestPW testPW = new TestPW();
     auto_chooser.setDefaultOption("None ", null);
-    auto_chooser.addOption("TestPP", testPP); 
     auto_chooser.addOption("TestPW", testPW); 
     driverTab.add(auto_chooser).withSize(2, 1).withPosition(4, 1);
   }
