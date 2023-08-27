@@ -31,12 +31,9 @@ public final class Constants {
     ManualMode
   }
   public static enum TypePipeline {
-    AllTags,
-    BlueGridTags,
-    BlueStationTag,
-    RedGridTags,
-    RedStationTag,
-    RetroflectiveTape
+    RetroflectiveTape,
+    BlueTags,
+    RedTags 
   }
   
   public static enum AutoBalanceStages {

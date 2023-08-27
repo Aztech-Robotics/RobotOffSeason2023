@@ -5,17 +5,21 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.MechanismMode;
+import frc.robot.Constants.TypePipeline;
 import frc.robot.interfaces.AutoInterface;
 import frc.robot.modes.GamePieceMode;
 import frc.robot.modes.MechanismActionMode;
 import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.Vision;
 
 public class Robot extends TimedRobot {
   private ActionManager actionManager;
   private GamePieceMode gamePieceMode;
   private MechanismActionMode mechanismMode;
   private Drive drive  = Drive.getInstance();
+  private Vision vision = Vision.getInstance();
   private Command autonomousCommand;
   
   public static boolean flip_alliance (){
@@ -27,7 +31,6 @@ public class Robot extends TimedRobot {
     actionManager = new ActionManager();
     gamePieceMode = GamePieceMode.getInstance();
     mechanismMode = MechanismActionMode.getInstance();
-    teleopBindings();
     Telemetry.displayAutos();
   }
 
@@ -43,6 +46,8 @@ public class Robot extends TimedRobot {
     Controls.driver2.povLeft().onTrue(actionManager.moveStation(-1));
     Controls.driver2.rightBumper().onTrue(actionManager.requestAction());
     Controls.driver2.leftBumper().onTrue(actionManager.requestCancelAction());
+    Trigger gamePieceHaveChanged = new Trigger(() -> gamePieceMode.haveChanged());
+    gamePieceHaveChanged.onTrue(null); 
   }
 
   @Override
@@ -52,15 +57,16 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {}
-
+  
   @Override
   public void disabledPeriodic() {}
-
+  
   @Override
   public void autonomousInit() {
     AutoInterface auto_selected = Telemetry.auto_chooser.getSelected();
     if (auto_selected != null) {
       drive.resetOdometry(auto_selected.getStartingPose());
+      vision.setPipeline(flip_alliance() ? TypePipeline.RedTags : TypePipeline.BlueTags);
       autonomousCommand = auto_selected.getAutoCommand();
       autonomousCommand.schedule();
     }
@@ -68,12 +74,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {}
-
+  
   @Override
   public void teleopInit() {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    teleopBindings();
   }
 
   @Override

@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import frc.robot.Telemetry;
 import frc.robot.Constants.TypePipeline;
 import frc.robot.utils.LimelightHelpers;
 
@@ -9,19 +8,13 @@ public class Vision {
   private static Vision limelight;
   private TypePipeline activePipeline;
 
-  private Vision() {
-    //Telemetry.driverTab.addCamera("Limelight", "Limelight", getURL()).withSize(4, 4).withPosition(0, 0);
-  }
+  private Vision() {}
 
   public static Vision getInstance (){
     if (limelight == null){
       limelight = new Vision();
     }
     return limelight;
-  }
-
-  public String getURL (){
-    return LimelightHelpers.getLimelightURLString("limelight", "").getPath();
   }
 
   public double getTagID (){
@@ -63,23 +56,14 @@ public class Vision {
   public void setPipeline(TypePipeline pipeline){
     activePipeline = pipeline;
     switch (pipeline){
-      case AllTags:
-      LimelightHelpers.setPipelineIndex(null, 0);
-      break;
-      case RedGridTags:
+      case RetroflectiveTape:
       LimelightHelpers.setPipelineIndex(null, 1);
       break;
-      case BlueStationTag:
+      case BlueTags:
       LimelightHelpers.setPipelineIndex(null, 2);
       break;
-      case RedStationTag:
+      case RedTags:
       LimelightHelpers.setPipelineIndex(null, 3);
-      break;
-      case BlueGridTags:
-      LimelightHelpers.setPipelineIndex(null, 4);
-      break;
-      case RetroflectiveTape:
-      LimelightHelpers.setPipelineIndex(null, 5);
       break;
     }
   }

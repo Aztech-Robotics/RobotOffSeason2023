@@ -4,21 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MechanismMode;
-import frc.robot.actions.PickUpDouble;
-import frc.robot.actions.PickUpFloor;
-import frc.robot.actions.PickUpSingle;
-import frc.robot.actions.ScoreBottom;
-import frc.robot.actions.ScoreMiddle;
-import frc.robot.actions.ScoreTop;
 import frc.robot.commands.FieldOrientedDrive;
 import frc.robot.interfaces.ActionInterface;
-import frc.robot.modes.GamePieceMode;
 import frc.robot.modes.MechanismActionMode;
 import frc.robot.subsystems.Drive;
 
@@ -31,6 +23,7 @@ public class ActionManager extends SubsystemBase {
     private List<Command> commandsAwait = new ArrayList<>();
     private int level, station;
     private Command commandRunning;
+    private ActionInterface sticky_action;
 
     public ActionManager (){
         drive.setDefaultCommand(control_drive);
@@ -52,7 +45,7 @@ public class ActionManager extends SubsystemBase {
         }
     }
 
-    public Command requestAction (){
+    public CommandBase requestAction (){
         return runOnce(
             () -> {
                 if (!commandsAwait.isEmpty()){
@@ -63,16 +56,22 @@ public class ActionManager extends SubsystemBase {
                     switch (mechanismActionMode.getMode()){
                         case ManualMode:
                         commandRunning = ActionsSet.manual_mode;
+                        sticky_action = null;
                         break;
                         case SaveMechanism:
                         commandRunning = ActionsSet.save_mechanism;
+                        sticky_action = null;
                         break;
                         case PickUp:
-                        commandRunning = stations_map.get(station).getActionCommand();
+                        ActionInterface action = stations_map.get(station);
+                        commandRunning = action.getActionCommand();
+                        sticky_action = action; 
                         break;
                         case Score:
                         commandRunning = ActionsSet.prepare_high_pos;
-                        commandsAwait.add(scores_map.get(level).getActionCommand());
+                        action = scores_map.get(level);
+                        commandsAwait.add(action.getActionCommand());
+                        sticky_action = action;
                         break;
                     }
                 }
@@ -83,7 +82,7 @@ public class ActionManager extends SubsystemBase {
         );
     }
 
-    public Command requestCancelAction (){
+    public CommandBase requestCancelAction (){
         return runOnce(
             () -> {
                 if (commandRunning != null){
@@ -91,6 +90,16 @@ public class ActionManager extends SubsystemBase {
                     commandRunning = null;
                 }
                 commandsAwait.clear();
+            }
+        );
+    }
+
+    public CommandBase requestStickyAction (){
+        return runOnce(
+            () -> {
+                if (sticky_action != null){
+                    sticky_action.getActionCommand().schedule(); 
+                }
             }
         );
     }

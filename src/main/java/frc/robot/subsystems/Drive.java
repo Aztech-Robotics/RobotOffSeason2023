@@ -1,10 +1,5 @@
 package frc.robot.subsystems;
 
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.auto.PIDConstants;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
@@ -16,25 +11,19 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Robot;
 import frc.robot.Telemetry;
 import frc.robot.Constants.AutoBalanceStages;
-import frc.robot.Constants.MechanismMode;
 import frc.robot.Constants.SwerveMode;
 import frc.robot.Constants.SwerveSubMode;
-import frc.robot.Constants.TypePipeline;
-import frc.robot.modes.MechanismActionMode;
 import frc.robot.swerve.DriveMotionPlanner;
 import frc.robot.swerve.SwerveModule;
 
@@ -50,18 +39,14 @@ public class Drive extends SubsystemBase  {
   private ADXRS450_Gyro yaw_gyro = new ADXRS450_Gyro();
   private Vision vision = Vision.getInstance();
   private SwerveDrivePoseEstimator swerveDrivePoseEstimator;
-  private SwerveDriveOdometry swerveDriveOdometry;
   private DriveMotionPlanner motionPlanner;
   private ChassisSpeeds desiredChassisSpeeds;
   private SwerveMode swerveMode = SwerveMode.Nothing;
   private SwerveSubMode swerveSubMode = SwerveSubMode.Nothing;
   private AutoBalanceStages autoB_stage;
   private boolean odometryReseted = false; 
-  private boolean tagSearchActive = false;
-  private boolean readyForCorrectionPose = false;
   private boolean orientModulesOnZero = false;
   private Double time_update_mod = Double.NaN;
-  private SwerveAutoBuilder autoBuilder;
   
   private Drive() {
     modules[0] = new SwerveModule(
@@ -91,19 +76,7 @@ public class Drive extends SubsystemBase  {
     swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(swerveDriveKinematics, getYawAngle(), getModulesPosition(), new Pose2d(), 
     new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0), 
     new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0));
-    swerveDriveOdometry = new SwerveDriveOdometry(swerveDriveKinematics, getYawAngle(), getModulesPosition());
     motionPlanner = new DriveMotionPlanner();
-    autoBuilder = new SwerveAutoBuilder(
-      this::getCurrentPose, 
-      this::setCurrentPose, 
-      swerveDriveKinematics, 
-      new PIDConstants(5, 0, 0), 
-      new PIDConstants(0.25, 0, 0.01), 
-      this::setModulesStates, 
-      null, 
-      true, 
-      this
-    );
     yaw_gyro.calibrate();
     outputTelemetry();
   }
@@ -264,20 +237,11 @@ public class Drive extends SubsystemBase  {
   }
   
   public void updateOdometry (){
-    swerveDrivePoseEstimator.update(getYawAngle(), getModulesPosition());
-    /*
     if (vision.sawTag()){
-      if (tagSearchActive){
-        readyForCorrectionPose = true;
-      }
       swerveDrivePoseEstimator.addVisionMeasurement(vision.getBotPose(), Timer.getFPGATimestamp() - (vision.getLatencyPipeline()/1000.0) - (vision.getLatencyCapture()/1000.0));
     } else {
+      swerveDrivePoseEstimator.update(getYawAngle(), getModulesPosition());
     }
-     */
-  }
-
-  public Command getPathFollowingCommand (PathPlannerTrajectory trajectory){
-    return autoBuilder.followPathWithEvents(trajectory);
   }
 
   public void setTrajectory (Trajectory trajectory, Rotation2d target_rotation){
@@ -291,37 +255,6 @@ public class Drive extends SubsystemBase  {
 
   public boolean isDoneWithTrajectory (){
     return swerveSubMode == SwerveSubMode.Trajectory && motionPlanner.isTrajectoryFinished();
-  }
-
-  public void toggleTagSearch (){
-    tagSearchActive = !tagSearchActive;
-    readyForCorrectionPose = false; 
-    MechanismMode mode = MechanismActionMode.getInstance().getMode();
-    if (tagSearchActive){
-      if (Robot.flip_alliance()){
-        if (mode == MechanismMode.Score){
-          vision.setPipeline(TypePipeline.RedGridTags);
-        } else if (mode == MechanismMode.PickUp){
-          vision.setPipeline(TypePipeline.RedStationTag);
-        }
-      } else {
-        if (mode == MechanismMode.Score){
-          vision.setPipeline(TypePipeline.BlueGridTags);
-        } else if (mode == MechanismMode.PickUp){
-          vision.setPipeline(TypePipeline.BlueStationTag);
-        }
-      }
-    } else {
-      vision.setPipeline(TypePipeline.AllTags);
-    }
-  }
-
-  public boolean isTagSearchActive (){
-    return tagSearchActive;
-  }
-
-  public boolean isReadyForCorrectionPose (){
-    return readyForCorrectionPose; 
   }
 
   private double vel_first_stage = 0.0;
@@ -409,5 +342,6 @@ public class Drive extends SubsystemBase  {
     Telemetry.swerveTab.addDouble("X Error", () -> motionPlanner.getTranslationalError(getCurrentPose(), Timer.getFPGATimestamp()).getX()).withPosition(1, 3);
     Telemetry.swerveTab.addDouble("Y Error", () -> motionPlanner.getTranslationalError(getCurrentPose(), Timer.getFPGATimestamp()).getY()).withPosition(2, 3);
     Telemetry.swerveTab.addDouble("Theta Error", () -> motionPlanner.getRotationalError(getYawAngle()).getDegrees()).withPosition(3, 3);
+    Telemetry.swerveTab.addBoolean("TrajectoryIsFinished", () -> isDoneWithTrajectory()); 
   }
 }

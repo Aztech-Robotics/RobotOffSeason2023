@@ -30,7 +30,6 @@ public class DriveMotionPlanner {
         rotation_controller.enableContinuousInput(0, 2 * Math.PI);
         rotation_controller.setTolerance(0.15);
         drive_controller = new HolonomicDriveController(y_controller, x_controller, rotation_controller);
-        Telemetry.swerveTab.addBoolean("TrajectoryIsFinished", () -> isTrajectoryFinished); 
     }
 
     public void setTrajectory (Trajectory trajectory, Rotation2d heading, Pose2d current_pose){
