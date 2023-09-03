@@ -1,7 +1,10 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.Robot;
 import frc.robot.Constants.TypePipeline;
+import frc.robot.modes.GamePieceMode;
 import frc.robot.utils.LimelightHelpers;
 
 public class Vision {
@@ -57,14 +60,31 @@ public class Vision {
     activePipeline = pipeline;
     switch (pipeline){
       case RetroflectiveTape:
-      LimelightHelpers.setPipelineIndex(null, 1);
+      //LimelightHelpers.setPipelineIndex(null, 0);
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
       break;
       case BlueTags:
-      LimelightHelpers.setPipelineIndex(null, 2);
+      //LimelightHelpers.setPipelineIndex(null, 1);
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
       break;
       case RedTags:
-      LimelightHelpers.setPipelineIndex(null, 3);
+      //LimelightHelpers.setPipelineIndex(null, 2);
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(2);
       break;
+    }
+  }
+
+  public void setPipelineByMode (){
+    switch (GamePieceMode.getInstance().getMode()){
+      case Cone:
+      setPipeline(TypePipeline.RetroflectiveTape);
+      break;
+      case Cube:
+      if (Robot.flip_alliance()){
+        setPipeline(TypePipeline.RedTags);
+      } else {
+        setPipeline(TypePipeline.BlueTags);
+      }
     }
   }
 

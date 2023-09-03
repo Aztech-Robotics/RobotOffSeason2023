@@ -9,6 +9,7 @@ public class Controls {
     public static CommandXboxController driver1 = new CommandXboxController(0);
     public static CommandXboxController driver2 = new CommandXboxController(1);
 
+    //Traccion
     public static DoubleSupplier getLeftYD1 () {
         return () -> MathUtil.applyDeadband(driver1.getLeftY(), 0.2);
     }
@@ -17,28 +18,29 @@ public class Controls {
         return () -> MathUtil.applyDeadband(driver1.getLeftX(), 0.2);
     }
 
+    public static DoubleSupplier getRightYD1 () {
+        return () -> MathUtil.applyDeadband(driver2.getRightY(), 0.2);
+    }
+
     public static DoubleSupplier getRightXD1 () {
         return () -> MathUtil.applyDeadband(driver1.getRightX(), 0.2);
     }
 
+    //Mechanism
     public static DoubleSupplier getLeftYD2 () {
-        return () -> MathUtil.applyDeadband(driver2.getLeftY(), 0.2);
+        return () -> MathUtil.applyDeadband(-driver2.getLeftY(), 0.2);
     }
 
     public static DoubleSupplier getLeftXD2 () {
         return () -> MathUtil.applyDeadband(driver2.getLeftX(), 0.2);
     }
 
-    public static DoubleSupplier getRightYD1 () {
-        return () -> MathUtil.applyDeadband(driver2.getRightY(), 0.2);
+    public static DoubleSupplier getRightYD2 () {
+        return () -> MathUtil.applyDeadband(-driver2.getRightY(), 0.2);
     }
 
     public static DoubleSupplier getRightXD2 () {
         return () -> MathUtil.applyDeadband(driver2.getRightX(), 0.2);
-    }
-
-    public static DoubleSupplier getRightYD2 () {
-        return () -> MathUtil.applyDeadband(driver2.getRightY(), 0.2);
     }
 
     public static DoubleSupplier getLeftTD1 (){
@@ -56,5 +58,4 @@ public class Controls {
     public static DoubleSupplier getRightTD2 (){
         return () -> driver2.getRightTriggerAxis();
     }
-
 }

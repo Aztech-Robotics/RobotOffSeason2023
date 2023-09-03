@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.MechanismMode;
 import frc.robot.Constants.TypePipeline;
 import frc.robot.interfaces.AutoInterface;
@@ -46,8 +45,6 @@ public class Robot extends TimedRobot {
     Controls.driver2.povLeft().onTrue(actionManager.moveStation(-1));
     Controls.driver2.rightBumper().onTrue(actionManager.requestAction());
     Controls.driver2.leftBumper().onTrue(actionManager.requestCancelAction());
-    Trigger gamePieceHaveChanged = new Trigger(() -> gamePieceMode.haveChanged());
-    gamePieceHaveChanged.onTrue(null); 
   }
 
   @Override

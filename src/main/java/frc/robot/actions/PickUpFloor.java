@@ -1,7 +1,8 @@
 package frc.robot.actions;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.TestCommand;
+import frc.robot.commands.ArmPosition;
 import frc.robot.interfaces.ActionClass;
 import frc.robot.interfaces.ActionInterface;
 
@@ -16,13 +17,11 @@ public class PickUpFloor extends ActionClass implements ActionInterface{
 
     @Override
     public Command actionForCone (){
-        TestCommand command = new TestCommand("PickUp Floor For Cone", 5);
-        return command;
+        return new ArmPosition(Rotation2d.fromDegrees(60).getRotations());
     }
 
     @Override
     public Command actionForCube (){
-        TestCommand command = new TestCommand("PickUp Floor For Cube", 5);
-        return command;
+        return new ArmPosition(Rotation2d.fromDegrees(60).getRotations());
     }
 }

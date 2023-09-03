@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.Telemetry;
 import frc.robot.Constants.AutoBalanceStages;
 import frc.robot.Constants.SwerveMode;
@@ -121,7 +122,7 @@ public class Drive extends SubsystemBase  {
           case AutoBalance:
           desiredChassisSpeeds = updateAutoBalance(now);
           break;
-          case Nothing:
+          case Nothing: 
           break;
         }
         if (desiredChassisSpeeds != null) {
@@ -134,7 +135,6 @@ public class Drive extends SubsystemBase  {
           }
           else {
             modules_states = swerveDriveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
-            SwerveDriveKinematics.desaturateWheelSpeeds(modules_states, Constants.maxDriveVel);
           }
           setModulesStates(modules_states);
         }
@@ -142,6 +142,7 @@ public class Drive extends SubsystemBase  {
         updateOdometry();
       break;
     }
+    vision.setPipelineByMode();
   }
 
   public void setMode (SwerveMode swerveMode){
@@ -238,7 +239,11 @@ public class Drive extends SubsystemBase  {
   
   public void updateOdometry (){
     if (vision.sawTag()){
-      swerveDrivePoseEstimator.addVisionMeasurement(vision.getBotPose(), Timer.getFPGATimestamp() - (vision.getLatencyPipeline()/1000.0) - (vision.getLatencyCapture()/1000.0));
+      if (Robot.flip_alliance()){
+        swerveDrivePoseEstimator.addVisionMeasurement(vision.getBotPoseRedAlliance(), Timer.getFPGATimestamp() - (vision.getLatencyPipeline()/1000.0) - (vision.getLatencyCapture()/1000.0));
+      } else {
+        swerveDrivePoseEstimator.addVisionMeasurement(vision.getBotPoseBlueAlliance(), Timer.getFPGATimestamp() - (vision.getLatencyPipeline()/1000.0) - (vision.getLatencyCapture()/1000.0));
+      }
     } else {
       swerveDrivePoseEstimator.update(getYawAngle(), getModulesPosition());
     }

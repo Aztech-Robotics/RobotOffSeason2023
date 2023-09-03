@@ -6,8 +6,8 @@ import frc.robot.subsystems.Arm;
 
 public class ArmPosition extends CommandBase {
   private Arm arm = Arm.getInstance();
-  private Rotation2d target_angle;
-  public ArmPosition(Rotation2d target_angle) {
+  private double target_angle;
+  public ArmPosition(double target_angle) {
     this.target_angle = target_angle;
     addRequirements(arm); 
   }
@@ -19,6 +19,6 @@ public class ArmPosition extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return arm.isAtTargetPosition();
+    return Math.abs(target_angle - arm.getPosition()) <= Rotation2d.fromDegrees(2).getRotations();
   }
 }

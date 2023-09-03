@@ -2,6 +2,7 @@ package frc.robot.modes;
 
 import java.util.Map;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Telemetry;
@@ -57,13 +58,10 @@ public class GamePieceMode extends SubsystemBase {
     }
 
     public boolean haveChanged (){
-        if (notifier){
-            notifier = false;
-            return true;
-        }
-        else {
-            return false;
-        }
+        boolean aux = notifier;
+        SmartDashboard.putBoolean("HC", aux);
+        notifier = false;
+        return aux;
     }
 
     public void outputTelemetry (){

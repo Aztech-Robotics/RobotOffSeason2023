@@ -24,5 +24,5 @@ public class ActionsSet {
     public static final ScoreTop score_top = new ScoreTop();
     public static final TakePiece take_piece = new TakePiece();
     public static final DropPiece drop_piece = new DropPiece();
-    public static final ArmPosition prepare_high_pos = new ArmPosition(Rotation2d.fromDegrees(0));
+    public static final ArmPosition prepare_high_pos = new ArmPosition(Rotation2d.fromDegrees(0).getRotations());
 }

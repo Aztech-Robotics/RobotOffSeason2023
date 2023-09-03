@@ -11,7 +11,6 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
-import frc.robot.Telemetry;
 
 public class DriveMotionPlanner {
     private final PIDController y_controller;
@@ -53,8 +52,6 @@ public class DriveMotionPlanner {
                 start_time = Timer.getFPGATimestamp();
             }
             double seconds = current_time - start_time;
-            SmartDashboard.putNumber("TrajTime", seconds);
-            SmartDashboard.putNumber("Running Traj of ", current_trajectory.getTotalTimeSeconds());
             Trajectory.State desired_state;
             if (seconds < current_trajectory.getTotalTimeSeconds()){
                 desired_state = current_trajectory.sample(seconds);

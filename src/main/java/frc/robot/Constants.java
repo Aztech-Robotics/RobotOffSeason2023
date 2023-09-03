@@ -1,8 +1,5 @@
 package frc.robot;
 
-import java.util.Map;
-
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -105,14 +102,21 @@ public final class Constants {
   //Telescopic
   public static final int id_tel_master = 15;
   public static final int id_tel_sleeve = 16;
+  public static final double tel_ratio = 1;
+  public static final double kp_tel = 0;
+  public static final double ki_tel = 0;
+  public static final double kd_tel = 0;
 
   //Wrist
   public static final int id_wrist = 17;
+  public static final double wrist_ratio = 1;
+  public static final double kp_wrist = 0;
+  public static final double ki_wrist = 0;
+  public static final double kd_wrist = 0;
 
   //Intake
   public static final int id_intake = 18;
   
-  public static final CentripetalAccelerationConstraint cent_accel_traj = new CentripetalAccelerationConstraint(0);
   //Trajectories Paths
   public static final String autoDPath1 = "paths/AutoDPath1.path";
   public static final String autoDPath2 = "paths/AutoDPath2.path";
@@ -133,11 +137,12 @@ public final class Constants {
   public static final double kd_rot = 0.0;
   public static final Constraints rot_constraints = new Constraints(maxAngVel, Math.pow(maxAngVel, 2));
 
+  public static final CentripetalAccelerationConstraint cent_accel_traj = new CentripetalAccelerationConstraint(Math.PI);
   public static TrajectoryConfig getTrajConfig (double maxVel, double maxAccel, double startVel, double endVel){
     TrajectoryConfig config = new TrajectoryConfig(maxVel, maxAccel);
     config.setStartVelocity(startVel);
     config.setEndVelocity(endVel);
-    //config.addConstraint(new CentripetalAccelerationConstraint(Math.PI)); 
+    config.addConstraint(cent_accel_traj); 
     return config;
   }
 
@@ -149,71 +154,10 @@ public final class Constants {
   public static final double ki_chase = 0.0;
   public static final double kd_chase = 0.0;
   public static final Constraints chase_constraints = new Constraints(0, 0); 
-  
 
   public static class FieldLayout {
     public static final double kFieldLength = Units.inchesToMeters(651.25);
     public static final double kFieldWidth = Units.inchesToMeters(315.5);
     public static final double kTapeWidth = Units.inchesToMeters(2.0);
-  
-    public static class blueGridPoses {
-      public static final Map<Integer, Pose2d> map = Map.of(
-        1, new Pose2d(0, 0, null),
-        2, new Pose2d(0, 0, null),
-        3, new Pose2d(0, 0, null),
-        4, new Pose2d(0, 0, null),
-        5, new Pose2d(0, 0, null), 
-        6, new Pose2d(0, 0, null),
-        7, new Pose2d(0, 0, null),
-        8, new Pose2d(0, 0, null),
-        9, new Pose2d(0, 0, null)
-      );
-  
-      public static Pose2d getPose (int node){
-        return map.get(node);
-      }
-    }
-  
-    public static class blueStationPoses {
-      public static final Map<Integer, Pose2d> map = Map.of(
-        1, new Pose2d(0, 0, null),
-        2, new Pose2d(0, 0, null),
-        3, new Pose2d(0, 0, null)
-      );
-  
-      public static Pose2d getPose (int station){
-        return map.get(station);
-      }
-    }
-  
-    public static class redGridPoses {
-      public static final Map<Integer, Pose2d> map = Map.of(
-        1, new Pose2d(0, 0, null),
-        2, new Pose2d(0, 0, null),
-        3, new Pose2d(0, 0, null),
-        4, new Pose2d(0, 0, null),
-        5, new Pose2d(0, 0, null), 
-        6, new Pose2d(0, 0, null),
-        7, new Pose2d(0, 0, null),
-        8, new Pose2d(0, 0, null),
-        9, new Pose2d(0, 0, null)
-      );
-  
-      public static Pose2d getPose (int node){
-        return map.get(node);
-      }
-    }
-  
-    public static class redStationPoses {
-      public static final Map<Integer, Pose2d> map = Map.of(
-        1, new Pose2d(0, 0, null),
-        2, new Pose2d(0, 0, null),
-        3, new Pose2d(0, 0, null)
-      );
-  
-      public static Pose2d getPose (int station){
-        return map.get(station);
-      }
-    }
   }
 }

@@ -16,16 +16,15 @@ public class ManualCommand extends CommandBase {
   private final Intake intake = Intake.getInstance();
   private final DoubleSupplier armSupplier = Controls.getLeftYD2();
   private final DoubleSupplier telSupplier = Controls.getRightYD2();
-  private final DoubleSupplier wrist_art_Supplier1 = Controls.getLeftTD2(); 
-  private final DoubleSupplier wrist_art_Supplier2 = Controls.getRightTD2(); 
-  private final DoubleSupplier intakeSupplier1 = Controls.getLeftTD1();
-  private final DoubleSupplier intakeSupplier2 = Controls.getRightTD1();
+  private final DoubleSupplier wrist_Supplier1 = Controls.getLeftTD2(); 
+  private final DoubleSupplier wrist__Supplier2 = Controls.getRightTD2(); 
   public ManualCommand() {
     addRequirements(arm, telescopic, wrist, intake);
   }
 
   @Override
   public void execute() {
+    arm.setVelocity(armSupplier.getAsDouble());
   }
 
   @Override

@@ -38,7 +38,6 @@ public class ActionManager extends SubsystemBase {
     @Override
     public void periodic (){
         if (commandRunning != null){
-            SmartDashboard.putBoolean("Running", commandRunning.isFinished());
             if (commandRunning.isFinished()){
                 commandRunning = null;
             }
@@ -90,16 +89,6 @@ public class ActionManager extends SubsystemBase {
                     commandRunning = null;
                 }
                 commandsAwait.clear();
-            }
-        );
-    }
-
-    public CommandBase requestStickyAction (){
-        return runOnce(
-            () -> {
-                if (sticky_action != null){
-                    sticky_action.getActionCommand().schedule(); 
-                }
             }
         );
     }
