@@ -18,6 +18,14 @@ public class ArmPosition extends CommandBase {
   }
 
   @Override
+  public void execute() {}
+
+  @Override
+  public void end(boolean interrupted) {
+    arm.setVelocity(0);
+  }
+
+  @Override
   public boolean isFinished() {
     return Math.abs(target_angle - arm.getPosition()) <= Rotation2d.fromDegrees(2).getRotations();
   }

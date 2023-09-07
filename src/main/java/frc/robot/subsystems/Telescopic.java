@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxPIDController;
@@ -21,21 +20,22 @@ public class Telescopic extends SubsystemBase {
   private final CANSparkMax tel_sleeve = new CANSparkMax(Constants.id_tel_sleeve, MotorType.kBrushless);
   private final RelativeEncoder enc_tel = tel_master.getEncoder(); 
   private final SparkMaxPIDController  tel_controller = tel_master.getPIDController();
-  private final SparkMaxLimitSwitch limit = tel_master.getReverseLimitSwitch(Type.kNormallyClosed); 
   private boolean isBrakeMode = false; 
+  private final float max_pos = 10;
 
   private Telescopic() {
     tel_master.enableVoltageCompensation(12);
-    tel_master.setSmartCurrentLimit(50);
-    tel_sleeve.setSmartCurrentLimit(50);
-    enc_tel.setPositionConversionFactor(0);
-    tel_controller.setP(0);
-    tel_controller.setI(0);
-    tel_controller.setD(0);
+    tel_master.setSmartCurrentLimit(40);
+    tel_sleeve.setSmartCurrentLimit(40);
+    enc_tel.setPositionConversionFactor(1 / Constants.tel_ratio);
+    tel_controller.setP(Constants.kp_tel);
+    tel_controller.setI(Constants.ki_tel);
+    tel_controller.setD(Constants.kd_tel);
     tel_controller.setSmartMotionMaxVelocity(0, 0);
     tel_controller.setSmartMotionMaxAccel(0, 0);
     tel_controller.setSmartMotionAllowedClosedLoopError(0, 0); 
-    setNeutralMode(IdleMode.kCoast);
+    setNeutralMode(IdleMode.kBrake);
+    outputTelemetry();
   }
 
   public static Telescopic getInstance (){
@@ -52,9 +52,6 @@ public class Telescopic extends SubsystemBase {
     } else {
       if (isBrakeMode) setNeutralMode(IdleMode.kCoast);
     }
-    if (limit.isPressed()){
-      enc_tel.setPosition(0);
-    }
   }
 
   public void setNeutralMode (IdleMode mode){
@@ -64,13 +61,13 @@ public class Telescopic extends SubsystemBase {
   }
 
   public void enableLimits (){
-    limit.enableLimitSwitch(true);
+    tel_master.enableSoftLimit(SoftLimitDirection.kReverse, true);
+    tel_master.setSoftLimit(SoftLimitDirection.kReverse, 0); 
     tel_master.enableSoftLimit(SoftLimitDirection.kForward, true);
-    tel_master.setSoftLimit(SoftLimitDirection.kForward, 0); 
+    tel_master.setSoftLimit(SoftLimitDirection.kForward, max_pos); 
   }
 
   public void disableLimits (){
-    limit.enableLimitSwitch(false);
     tel_master.enableSoftLimit(SoftLimitDirection.kForward, false);
   }
 
@@ -89,7 +86,6 @@ public class Telescopic extends SubsystemBase {
   }
 
   public void outputTelemetry (){
-    Telemetry.mechanismTab.addBoolean("Tel RLimit", () -> limit.isPressed());
     Telemetry.mechanismTab.addDouble("Tel Pos", () -> getPos());
   }
 }

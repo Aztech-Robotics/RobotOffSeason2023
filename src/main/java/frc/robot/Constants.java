@@ -91,8 +91,8 @@ public final class Constants {
   //Arm 
   public static final int id_arm_master = 13;
   public static final int id_arm_sleeve = 14;
-  public static final double arm_ratio = 137.5;
-  public static final double kp_arm = 0;
+  public static final double arm_ratio = 133.34;
+  public static final double kp_arm = 0.01;
   public static final double ki_arm = 0;
   public static final double kd_arm = 0;
   public static final double ks_arm = 0;
@@ -103,23 +103,24 @@ public final class Constants {
   public static final int id_tel_master = 15;
   public static final int id_tel_sleeve = 16;
   public static final double tel_ratio = 1;
-  public static final double kp_tel = 0;
+  public static final double kp_tel = 0.01;
   public static final double ki_tel = 0;
   public static final double kd_tel = 0;
 
   //Wrist
   public static final int id_wrist = 17;
-  public static final double wrist_ratio = 1;
-  public static final double kp_wrist = 0;
+  public static final double wrist_ratio = 17.53125;
+  public static final double kp_wrist = 0.004;
   public static final double ki_wrist = 0;
-  public static final double kd_wrist = 0;
+  public static final double kd_wrist = 0.5;
+  public static final double kIz_wrist = 0;
+  public static final double kff_wrist = 0;
+
 
   //Intake
   public static final int id_intake = 18;
   
   //Trajectories Paths
-  public static final String autoDPath1 = "paths/AutoDPath1.path";
-  public static final String autoDPath2 = "paths/AutoDPath2.path";
   public static final String pathOutOfComm = "paths/PathOutOfComm.path";
   public static final String pathToCS = "paths/PathToCS.path";
 

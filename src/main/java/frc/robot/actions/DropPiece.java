@@ -1,6 +1,7 @@
 package frc.robot.actions;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.IntakeVel;
 import frc.robot.interfaces.ActionClass;
 import frc.robot.interfaces.ActionInterface;
 
@@ -15,11 +16,11 @@ public class DropPiece extends ActionClass implements ActionInterface {
 
     @Override
     public Command actionForCone (){
-        return null;
+        return new IntakeVel(-0.5);
     }
 
     @Override
     public Command actionForCube (){
-        return null;
+        return new IntakeVel(0.5);
     }
 }

@@ -5,31 +5,33 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.commands.FollowPath;
+import frc.robot.commands.IntakeVel;
 import frc.robot.interfaces.AutoInterface;
 import frc.robot.utils.AutoTrajectoryReader;
 
-public class TwoPiecesAuto implements AutoInterface {
-    private final Trajectory test_traj;
-    private final FollowPath test_traj_com;
+public class AutoOutOfComm implements AutoInterface {
+    private final Trajectory traj;
+    private final FollowPath traj_com;
 
-    public TwoPiecesAuto (){
+    public AutoOutOfComm (){
         TrajectoryConfig config_test = Constants.getTrajConfig(1, 1, 0, 0);
-        test_traj = AutoTrajectoryReader.generateTrajectoryFromFile(Constants.autoDPath1, config_test);
-        test_traj_com = new FollowPath(test_traj, Rotation2d.fromDegrees(0));
+        traj = AutoTrajectoryReader.generateTrajectoryFromFile(Constants.pathOutOfComm, config_test);
+        traj_com = new FollowPath(traj, Rotation2d.fromDegrees(0));
     }
 
     @Override
     public Command getAutoCommand (){
-        return test_traj_com;
+        return traj_com;
     }
 
     @Override
     public Pose2d getStartingPose (){
         return new Pose2d(
-            test_traj.getInitialPose().getTranslation(), 
+            traj.getInitialPose().getTranslation(), 
             Rotation2d.fromDegrees(0)
         );
     }

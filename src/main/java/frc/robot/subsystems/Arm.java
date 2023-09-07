@@ -28,13 +28,14 @@ public class Arm extends SubsystemBase {
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.CurrentLimits.StatorCurrentLimit = 80.0;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
-    config.CurrentLimits.SupplyCurrentLimit = 50.0;
-    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; 
+    config.CurrentLimits.SupplyCurrentLimit = 40.0;
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; 
     arm_master.getConfigurator().apply(config);
     arm_sleeve.getConfigurator().apply(config);
     initMaster(); 
     setNeutralMode(NeutralModeValue.Brake);
     outputTelemetry();
+    arm_master.setRotorPosition(0);
   }
 
   public static Arm getInstance (){
@@ -64,7 +65,7 @@ public class Arm extends SubsystemBase {
     master_configs.Slot0.kS = Constants.ks_arm;
     master_configs.Slot0.kV = Constants.kv_arm;
     arm_master.getConfigurator().apply(master_configs); 
-    enableLimits(); 
+    //enableLimits(); 
   }
 
   public void setAngle (double angle){
@@ -93,6 +94,10 @@ public class Arm extends SubsystemBase {
     return arm_master.getPosition().getValue();
   }
 
+  public boolean getLimitValue () {
+    return arm_master.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround;
+  }
+
   public void enableLimits (){
     TalonFXConfiguration limits_config = new TalonFXConfiguration();
     limits_config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true; 
@@ -112,7 +117,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void outputTelemetry (){
-    Telemetry.mechanismTab.addBoolean("Arm RLimit", () -> arm_master.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround ? true : false);
+    Telemetry.mechanismTab.addBoolean("Arm RLimit", () -> getLimitValue());
     Telemetry.mechanismTab.addDouble("Arm Angle ", () -> Rotation2d.fromRotations(getPosition()).getDegrees());
   }
 }

@@ -58,7 +58,7 @@ public class ActionManager extends SubsystemBase {
                         sticky_action = null;
                         break;
                         case SaveMechanism:
-                        commandRunning = ActionsSet.save_mechanism;
+                        commandRunning = ActionsSet.save_mechanism.getActionCommand();
                         sticky_action = null;
                         break;
                         case PickUp:

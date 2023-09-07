@@ -109,7 +109,7 @@ public class Drive extends SubsystemBase  {
       break; 
       case OpenLoop:
         double now = Timer.getFPGATimestamp();
-        if (now - time_update_mod >= 5){
+        if (now - time_update_mod >= 1){
           for (SwerveModule swerveModule : modules){
             swerveModule.setAngleCanCoderToPositionMotor();
           }
@@ -142,7 +142,6 @@ public class Drive extends SubsystemBase  {
         updateOdometry();
       break;
     }
-    vision.setPipelineByMode();
   }
 
   public void setMode (SwerveMode swerveMode){
@@ -192,7 +191,7 @@ public class Drive extends SubsystemBase  {
   }
   
   public Rotation2d getYawAngle (){
-    return Rotation2d.fromDegrees(Math.IEEEremainder(-yaw_gyro.getAngle(), 360));
+    return Rotation2d.fromDegrees(Math.IEEEremainder(yaw_gyro.getAngle(), 360));
   }
 
   public void resetPitchAngle (){

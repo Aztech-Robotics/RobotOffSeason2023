@@ -5,21 +5,24 @@ import frc.robot.commands.WristPosition;
 import frc.robot.interfaces.ActionClass;
 import frc.robot.interfaces.ActionInterface;
 
-public class PickUpFloor extends ActionClass implements ActionInterface{
-    public PickUpFloor (){}
+public class SaveMechanism extends ActionClass implements ActionInterface {
+    private final Command save_mech;
+    public SaveMechanism (){
+        save_mech = new WristPosition(0); 
+    }
 
     @Override
     public Command getActionCommand (){
-        return super.selectActionCommand(this);
+        return save_mech;
     }
 
     @Override
     public Command actionForCone (){
-        return new WristPosition(-150);
+        return null;
     }
 
     @Override
     public Command actionForCube (){
-        return new WristPosition(-100);
+        return null;
     }
 }

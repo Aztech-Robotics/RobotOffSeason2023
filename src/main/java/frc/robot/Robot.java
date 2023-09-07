@@ -34,8 +34,10 @@ public class Robot extends TimedRobot {
   }
 
   public void teleopBindings (){
-    Controls.driver1.leftBumper().onTrue(drive.resetGyroComm());
-    Controls.driver2.a().onTrue(gamePieceMode.toggleMode());
+    Controls.driver1.a().onTrue(drive.resetGyroComm());
+    //Controls.driver2.rightBumper().whileTrue(ActionsSet.vel_pos);
+    //Controls.driver2.leftBumper().whileTrue(ActionsSet.vel_neg);
+    Controls.driver2.a().onTrue(gamePieceMode.toggleMode()); 
     Controls.driver2.b().onTrue(mechanismMode.toggleDriverMode());
     Controls.driver2.x().onTrue(mechanismMode.commandSetMode(MechanismMode.ManualMode));
     Controls.driver2.y().onTrue(mechanismMode.commandSetMode(MechanismMode.SaveMechanism));
@@ -46,7 +48,7 @@ public class Robot extends TimedRobot {
     Controls.driver2.rightBumper().onTrue(actionManager.requestAction());
     Controls.driver2.leftBumper().onTrue(actionManager.requestCancelAction());
   }
-
+  
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();

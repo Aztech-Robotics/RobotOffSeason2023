@@ -27,10 +27,10 @@ public class WayPointReader {
                 String[] split = line.split(",");
                 double x = Double.parseDouble(split[0]);
                 double x_tan = Double.parseDouble(split[2]);
-                if (Robot.flip_alliance()) {
-                    x = Constants.FieldLayout.kFieldLength - x;
-                    x_tan = - x_tan;
-                }
+                // if (Robot.flip_alliance()) {
+                //     x = Constants.FieldLayout.kFieldLength - x;
+                //     x_tan = - x_tan;
+                // }
                 controlVectors.add(new Spline.ControlVector(
                         new double[]{x, x_tan, 0},
                         new double[]{Double.parseDouble(split[1]), Double.parseDouble(split[3]), 0}));
