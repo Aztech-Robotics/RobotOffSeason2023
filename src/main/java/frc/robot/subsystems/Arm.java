@@ -23,13 +23,12 @@ public class Arm extends SubsystemBase {
   private final TalonFX arm_sleeve = new TalonFX(Constants.id_arm_sleeve);
   private final TalonFXConfiguration config = new TalonFXConfiguration();
   private final Rotation2d max_angle = Rotation2d.fromDegrees(80);
-  private boolean isBrakeMode = false;
   private Arm() {
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.CurrentLimits.StatorCurrentLimit = 80.0;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = 40.0;
-    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; 
+    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; 
     arm_master.getConfigurator().apply(config);
     arm_sleeve.getConfigurator().apply(config);
     initMaster(); 
@@ -49,11 +48,6 @@ public class Arm extends SubsystemBase {
   public void periodic() {
     arm_master.getClosedLoopError().refresh();
     arm_master.getPosition().refresh();
-    if (RobotState.isEnabled()){
-      if (!isBrakeMode) setNeutralMode(NeutralModeValue.Brake);
-    } else {
-      if (isBrakeMode) setNeutralMode(NeutralModeValue.Coast);
-    }
   }
 
   public void initMaster (){
@@ -68,8 +62,8 @@ public class Arm extends SubsystemBase {
     //enableLimits(); 
   }
 
-  public void setAngle (double angle){
-    PositionDutyCycle requestMaster = new PositionDutyCycle(angle, false, Constants.ff_arm, 0, true);
+  public void setAngle (Rotation2d angle){
+    PositionDutyCycle requestMaster = new PositionDutyCycle(angle.getRotations(), false, Constants.ff_arm, 0, true);
     Follower requestSleeve = new Follower(arm_master.getDeviceID(), true);
     arm_master.setControl(requestMaster);
     arm_sleeve.setControl(requestSleeve);
@@ -83,7 +77,6 @@ public class Arm extends SubsystemBase {
   }
 
   public void setNeutralMode (NeutralModeValue mode){
-    isBrakeMode = mode == NeutralModeValue.Brake ? true : false;
     MotorOutputConfigs config = new MotorOutputConfigs();
     config.NeutralMode = mode;
     arm_master.getConfigurator().apply(config);

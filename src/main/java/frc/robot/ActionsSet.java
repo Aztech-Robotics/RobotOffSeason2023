@@ -11,7 +11,6 @@ import frc.robot.actions.ScoreMiddle;
 import frc.robot.actions.ScoreTop;
 import frc.robot.actions.TakePiece;
 import frc.robot.commands.ArmPosition;
-import frc.robot.commands.IntakeVel;
 import frc.robot.commands.ManualCommand;
 
 public class ActionsSet {
@@ -23,9 +22,7 @@ public class ActionsSet {
     public static final ScoreBottom score_bottom = new ScoreBottom();
     public static final ScoreMiddle score_middle = new ScoreMiddle();
     public static final ScoreTop score_top = new ScoreTop();
-    public static final ArmPosition prepare_high_pos = new ArmPosition(Rotation2d.fromDegrees(0).getRotations()); 
+    public static final ArmPosition prepare_high_pos = new ArmPosition(Rotation2d.fromDegrees(-50)); 
     public static final TakePiece take_piece = new TakePiece();
     public static final DropPiece drop_piece = new DropPiece();
-    public static final IntakeVel vel_pos = new IntakeVel(0.5);
-    public static final IntakeVel vel_neg = new IntakeVel(-0.5);
 }

@@ -92,12 +92,12 @@ public final class Constants {
   public static final int id_arm_master = 13;
   public static final int id_arm_sleeve = 14;
   public static final double arm_ratio = 133.34;
-  public static final double kp_arm = 0.01;
-  public static final double ki_arm = 0;
-  public static final double kd_arm = 0;
-  public static final double ks_arm = 0;
-  public static final double kv_arm = 0;
-  public static final double ff_arm = 0;
+  public static final double kp_arm = 4;
+  public static final double ki_arm = 0.0;
+  public static final double kd_arm = 2; 
+  public static final double ks_arm = 0.5;
+  public static final double kv_arm = 2.39;
+  public static final double ff_arm = 0.0;
 
   //Telescopic
   public static final int id_tel_master = 15;

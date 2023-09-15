@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,7 +22,6 @@ public class ActionManager extends SubsystemBase {
     private List<Command> commandsAwait = new ArrayList<>();
     private int level, station;
     private Command commandRunning;
-    private ActionInterface sticky_action;
 
     public ActionManager (){
         drive.setDefaultCommand(control_drive);
@@ -55,22 +53,22 @@ public class ActionManager extends SubsystemBase {
                     switch (mechanismActionMode.getMode()){
                         case ManualMode:
                         commandRunning = ActionsSet.manual_mode;
-                        sticky_action = null;
                         break;
                         case SaveMechanism:
                         commandRunning = ActionsSet.save_mechanism.getActionCommand();
-                        sticky_action = null;
                         break;
                         case PickUp:
                         ActionInterface action = stations_map.get(station);
                         commandRunning = action.getActionCommand();
-                        sticky_action = action; 
                         break;
                         case Score:
-                        commandRunning = ActionsSet.prepare_high_pos;
                         action = scores_map.get(level);
-                        commandsAwait.add(action.getActionCommand());
-                        sticky_action = action;
+                        if (level >= 2){
+                            commandRunning = ActionsSet.prepare_high_pos;
+                            commandsAwait.add(action.getActionCommand());
+                        } else {
+                            commandRunning = action.getActionCommand(); 
+                        }
                         break;
                     }
                 }

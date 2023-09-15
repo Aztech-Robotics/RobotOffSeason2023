@@ -25,7 +25,6 @@ public class FieldOrientedDrive extends CommandBase {
 
   @Override
   public void initialize() {
-    m_SwerveDrive.setMode(SwerveMode.OpenLoop);
   }
 
   @Override
@@ -43,7 +42,6 @@ public class FieldOrientedDrive extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_SwerveDrive.setDesiredChassisSpeeds(new ChassisSpeeds());
-    m_SwerveDrive.setMode(SwerveMode.Nothing);
   }
 
   @Override

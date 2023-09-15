@@ -5,11 +5,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
-import frc.robot.Robot;
 import frc.robot.commands.FollowPath;
-import frc.robot.commands.IntakeVel;
 import frc.robot.interfaces.AutoInterface;
 import frc.robot.utils.AutoTrajectoryReader;
 

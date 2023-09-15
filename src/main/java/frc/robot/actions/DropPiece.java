@@ -16,11 +16,11 @@ public class DropPiece extends ActionClass implements ActionInterface {
 
     @Override
     public Command actionForCone (){
-        return new IntakeVel(-0.5);
+        return null;
     }
 
     @Override
     public Command actionForCube (){
-        return new IntakeVel(0.5);
+        return null;
     }
 }

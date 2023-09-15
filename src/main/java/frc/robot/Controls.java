@@ -28,7 +28,7 @@ public class Controls {
 
     //Mechanism
     public static DoubleSupplier getLeftYD2 () {
-        return () -> MathUtil.applyDeadband(-driver2.getLeftY(), 0.2);
+        return () -> MathUtil.applyDeadband(driver2.getLeftY(), 0.2);
     }
 
     public static DoubleSupplier getLeftXD2 () {
@@ -36,7 +36,7 @@ public class Controls {
     }
 
     public static DoubleSupplier getRightYD2 () {
-        return () -> MathUtil.applyDeadband(-driver2.getRightY(), 0.2);
+        return () -> MathUtil.applyDeadband(driver2.getRightY(), 0.2);
     }
 
     public static DoubleSupplier getRightXD2 () {
