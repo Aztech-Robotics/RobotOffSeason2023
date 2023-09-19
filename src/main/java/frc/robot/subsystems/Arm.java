@@ -4,15 +4,14 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Telemetry;
@@ -22,19 +21,20 @@ public class Arm extends SubsystemBase {
   private final TalonFX arm_master = new TalonFX(Constants.id_arm_master);
   private final TalonFX arm_sleeve = new TalonFX(Constants.id_arm_sleeve);
   private final TalonFXConfiguration config = new TalonFXConfiguration();
-  private final Rotation2d max_angle = Rotation2d.fromDegrees(80);
+  private final Rotation2d max_angle = Rotation2d.fromDegrees(90);
+  private MotionMagicDutyCycle reqPosMaster = new MotionMagicDutyCycle(0, false, Constants.ff_arm, 0, true); 
+  private Follower reqFollowSleeve = new Follower(arm_master.getDeviceID(), true); 
   private Arm() {
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.CurrentLimits.StatorCurrentLimit = 80.0;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = 40.0;
-    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; 
     arm_master.getConfigurator().apply(config);
     arm_sleeve.getConfigurator().apply(config);
-    initMaster(); 
+    initMotors(); 
     setNeutralMode(NeutralModeValue.Brake);
     outputTelemetry();
-    arm_master.setRotorPosition(0);
+    resetArmPos(0);
   }
 
   public static Arm getInstance (){
@@ -45,12 +45,9 @@ public class Arm extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
-    arm_master.getClosedLoopError().refresh();
-    arm_master.getPosition().refresh();
-  }
+  public void periodic() {}
 
-  public void initMaster (){
+  public void initMotors (){
     TalonFXConfiguration master_configs = new TalonFXConfiguration();
     master_configs.Feedback.SensorToMechanismRatio = Constants.arm_ratio;
     master_configs.Slot0.kP = Constants.kp_arm;
@@ -58,22 +55,21 @@ public class Arm extends SubsystemBase {
     master_configs.Slot0.kD = Constants.kd_arm;
     master_configs.Slot0.kS = Constants.ks_arm;
     master_configs.Slot0.kV = Constants.kv_arm;
+    master_configs.MotionMagic.MotionMagicCruiseVelocity = 5;
+    master_configs.MotionMagic.MotionMagicAcceleration = 10;
+    master_configs.MotionMagic.MotionMagicJerk = 50;
     arm_master.getConfigurator().apply(master_configs); 
+    arm_sleeve.setControl(reqFollowSleeve);
     //enableLimits(); 
   }
 
   public void setAngle (Rotation2d angle){
-    PositionDutyCycle requestMaster = new PositionDutyCycle(angle.getRotations(), false, Constants.ff_arm, 0, true);
-    Follower requestSleeve = new Follower(arm_master.getDeviceID(), true);
-    arm_master.setControl(requestMaster);
-    arm_sleeve.setControl(requestSleeve);
+    arm_master.setControl(reqPosMaster.withPosition(angle.getRotations()));
   }
 
   public void setVelocity (double output){
     DutyCycleOut requestVel = new DutyCycleOut(output);
     arm_master.setControl(requestVel);  
-    Follower requestSleeve = new Follower(arm_master.getDeviceID(), true);
-    arm_sleeve.setControl(requestSleeve);
   }
 
   public void setNeutralMode (NeutralModeValue mode){
@@ -83,8 +79,12 @@ public class Arm extends SubsystemBase {
     arm_sleeve.getConfigurator().apply(config);
   }
 
-  public double getPosition (){
-    return arm_master.getPosition().getValue();
+  public Rotation2d getPosition (){
+    return Rotation2d.fromRotations(arm_master.getPosition().getValue());
+  }
+
+  public Rotation2d getError (){
+    return Rotation2d.fromRotations(arm_master.getClosedLoopError().getValue());
   }
 
   public boolean getLimitValue () {
@@ -109,8 +109,13 @@ public class Arm extends SubsystemBase {
     arm_master.getConfigurator().apply(limits_config);
   }
 
+  public void resetArmPos (double position){
+    arm_master.setRotorPosition(position); 
+  }
+
   public void outputTelemetry (){
     Telemetry.mechanismTab.addBoolean("Arm RLimit", () -> getLimitValue());
-    Telemetry.mechanismTab.addDouble("Arm Angle ", () -> Rotation2d.fromRotations(getPosition()).getDegrees());
+    Telemetry.mechanismTab.addDouble("Arm Angle ", () -> getPosition().getDegrees());
+    Telemetry.mechanismTab.addDouble("Arm Error", () -> getError().getDegrees()); 
   }
 }

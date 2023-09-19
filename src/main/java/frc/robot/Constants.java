@@ -99,17 +99,10 @@ public final class Constants {
   public static final double kv_arm = 2.39;
   public static final double ff_arm = 0.0;
 
-  //Telescopic
-  public static final int id_tel_master = 15;
-  public static final int id_tel_sleeve = 16;
-  public static final double tel_ratio = 1;
-  public static final double kp_tel = 0.01;
-  public static final double ki_tel = 0;
-  public static final double kd_tel = 0;
-
   //Wrist
   public static final int id_wrist = 17;
   public static final double wrist_ratio = 17.53125;
+  public static final double wristPositionCoefficient = 360 / wrist_ratio; 
   public static final double kp_wrist = 0.004;
   public static final double ki_wrist = 0;
   public static final double kd_wrist = 0.5;

@@ -16,18 +16,9 @@ public class ArmPosition extends CommandBase {
   public void initialize() {
     arm.setAngle(target_angle);
   }
-  
-  @Override
-  public void execute() {
-  }
-
-  @Override
-  public void end(boolean interrupted) {
-    arm.setVelocity(0);
-  }
 
   @Override
   public boolean isFinished() {
-    return false; //Math.abs(target_angle.getDegrees()) - Math.abs(Rotation2d.fromRotations(arm.getPosition()).getDegrees()) <= 2;
+    return Math.abs(arm.getError().getDegrees()) <= 2;
   }
 }

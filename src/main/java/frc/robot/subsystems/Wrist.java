@@ -8,7 +8,6 @@ import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Telemetry;
@@ -19,16 +18,22 @@ public class Wrist extends SubsystemBase {
   private final RelativeEncoder wrist_enc = wrist_m.getEncoder();
   private final SparkMaxPIDController wrist_controller = wrist_m.getPIDController();
   private final Rotation2d max_angle = Rotation2d.fromDegrees(220);
-  private boolean isBrakeMode = false; 
   
   private Wrist() {
-    wrist_m.setInverted(true);
     wrist_m.enableVoltageCompensation(12);
     wrist_m.setSmartCurrentLimit(40);
+    wrist_enc.setPositionConversionFactor(Constants.wristPositionCoefficient); 
     wrist_controller.setP(Constants.kp_wrist);
     wrist_controller.setI(Constants.ki_wrist);
     wrist_controller.setD(Constants.kd_wrist);
-    setNeutralMode(IdleMode.kCoast);
+    wrist_controller.setFF(Constants.kff_wrist);
+    wrist_controller.setIZone(Constants.kIz_wrist); 
+    wrist_controller.setSmartMotionMaxVelocity(0, 0);
+    wrist_controller.setSmartMotionMaxAccel(0, 0);
+    wrist_controller.setSmartMotionMinOutputVelocity(0, 0);
+    wrist_controller.setSmartMotionAllowedClosedLoopError(0, 0); 
+    setNeutralMode(IdleMode.kBrake);
+    wrist_m.burnFlash();
     outputTelemetry();
     wrist_enc.setPosition(0);
   }
@@ -40,13 +45,8 @@ public class Wrist extends SubsystemBase {
     return wrist;
   }
 
-  @Override
-  public void periodic() {
-  }
-
   public void setNeutralMode (IdleMode mode){
     wrist_m.setIdleMode(mode);
-    isBrakeMode = mode == IdleMode.kBrake ? true : false;
   }
 
   public void enableLimits (){
@@ -66,8 +66,7 @@ public class Wrist extends SubsystemBase {
   }
 
   public void setTargetAngle (double angle){
-    double real_pos = (angle/360) * Constants.wrist_ratio;
-    wrist_controller.setReference(real_pos, CANSparkMax.ControlType.kPosition);
+    wrist_controller.setReference(angle, CANSparkMax.ControlType.kSmartMotion);
   }
 
   public double getPos (){

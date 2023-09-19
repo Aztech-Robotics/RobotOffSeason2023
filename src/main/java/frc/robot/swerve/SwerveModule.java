@@ -86,7 +86,7 @@ public class SwerveModule {
     public double getPositionSpeedMotor (){
         return encoder_speedMotor.getPosition();
     }
-
+        
     public Rotation2d getCanCoderAngle (){
         return Rotation2d.fromDegrees(cancoder_steerMotor.getAbsolutePosition());
     }

@@ -1,15 +1,23 @@
 package frc.robot.actions;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import frc.robot.commands.ArmPosition;
 import frc.robot.interfaces.ActionClass;
 import frc.robot.interfaces.ActionInterface;
 
 public class SaveMechanism extends ActionClass implements ActionInterface {
-    public SaveMechanism (){}
+    private final ParallelCommandGroup action;
+    public SaveMechanism (){
+        action = new ParallelCommandGroup(
+            new ArmPosition(Rotation2d.fromDegrees(50))
+        ); 
+    }
 
     @Override
     public Command getActionCommand (){
-        return null;
+        return action;
     }
 
     @Override
