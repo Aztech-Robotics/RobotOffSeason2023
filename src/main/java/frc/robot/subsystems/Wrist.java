@@ -28,12 +28,11 @@ public class Wrist extends SubsystemBase {
     wrist_controller.setD(Constants.kd_wrist);
     wrist_controller.setFF(Constants.kff_wrist);
     wrist_controller.setIZone(Constants.kIz_wrist); 
-    wrist_controller.setSmartMotionMaxVelocity(0, 0);
-    wrist_controller.setSmartMotionMaxAccel(0, 0);
-    wrist_controller.setSmartMotionMinOutputVelocity(0, 0);
-    wrist_controller.setSmartMotionAllowedClosedLoopError(0, 0); 
+    wrist_controller.setSmartMotionMaxVelocity(2000, 0);
+    wrist_controller.setSmartMotionMaxAccel(1500, 0);
+    wrist_controller.setOutputRange(-1, 1);
+    wrist_controller.setSmartMotionAllowedClosedLoopError(2, 0); 
     setNeutralMode(IdleMode.kBrake);
-    wrist_m.burnFlash();
     outputTelemetry();
     wrist_enc.setPosition(0);
   }

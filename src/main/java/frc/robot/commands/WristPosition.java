@@ -18,7 +18,6 @@ public class WristPosition extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    wrist.setVelocity(0);
   }
 
   @Override

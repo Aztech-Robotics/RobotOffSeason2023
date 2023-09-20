@@ -94,18 +94,18 @@ public final class Constants {
   public static final double arm_ratio = 133.34;
   public static final double kp_arm = 4;
   public static final double ki_arm = 0.0;
-  public static final double kd_arm = 2; 
-  public static final double ks_arm = 0.5;
-  public static final double kv_arm = 2.39;
+  public static final double kd_arm = 0.0; 
+  public static final double ks_arm = 0.0;
+  public static final double kv_arm = 0.0;
   public static final double ff_arm = 0.0;
 
   //Wrist
   public static final int id_wrist = 17;
-  public static final double wrist_ratio = 17.53125;
+  public static final double wrist_ratio = 42.5;
   public static final double wristPositionCoefficient = 360 / wrist_ratio; 
-  public static final double kp_wrist = 0.004;
+  public static final double kp_wrist = 0.0005;
   public static final double ki_wrist = 0;
-  public static final double kd_wrist = 0.5;
+  public static final double kd_wrist = 0.005;
   public static final double kIz_wrist = 0;
   public static final double kff_wrist = 0;
 

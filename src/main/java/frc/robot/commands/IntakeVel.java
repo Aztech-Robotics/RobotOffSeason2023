@@ -20,12 +20,11 @@ public class IntakeVel extends CommandBase {
 
   @Override
   public void execute() {
-    MechanismMode mechanismMode = MechanismActionMode.getInstance().getMode(); 
     GameElement gameElement = GamePieceMode.getInstance().getMode();
     double velocity = Controls.getTD2().getAsDouble();
-    if ((mechanismMode == MechanismMode.PickUp && gameElement == GameElement.Cone) || (mechanismMode == MechanismMode.Score && gameElement == GameElement.Cone)){
+    if (gameElement == GameElement.Cube){
       velocity = -velocity; 
-    }
+    } 
     intake.setVelocity(velocity);
   }
 

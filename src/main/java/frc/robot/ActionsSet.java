@@ -6,7 +6,7 @@ import frc.robot.actions.PickUpSingle;
 import frc.robot.actions.SaveMechanism;
 import frc.robot.actions.ScoreBottom;
 import frc.robot.actions.ScoreMiddle;
-import frc.robot.commands.ArmPosition;
+import frc.robot.commands.IntakeVel;
 import frc.robot.commands.ManualCommand;
 
 public class ActionsSet {
@@ -16,5 +16,5 @@ public class ActionsSet {
     public static final PickUpSingle pickup_single = new PickUpSingle();
     public static final ScoreBottom score_bottom = new ScoreBottom();
     public static final ScoreMiddle score_middle = new ScoreMiddle();
-    public static final ArmPosition prepare_high_pos = new ArmPosition(Rotation2d.fromDegrees(-50)); 
+    public static final IntakeVel intakeCommand = new IntakeVel();
 }

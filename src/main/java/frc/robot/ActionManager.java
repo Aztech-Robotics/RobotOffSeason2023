@@ -16,7 +16,8 @@ import frc.robot.subsystems.Intake;
 
 public class ActionManager extends SubsystemBase {
     private Drive drive = Drive.getInstance();
-    private FieldOrientedDrive control_drive = new FieldOrientedDrive(); 
+    private FieldOrientedDrive control_drive = new FieldOrientedDrive();
+    private Intake intake = Intake.getInstance();  
     private MechanismActionMode mechanismActionMode = MechanismActionMode.getInstance();
     private Map<Integer, ActionInterface> scores_map;
     private Map<Integer, ActionInterface> stations_map;
@@ -26,6 +27,7 @@ public class ActionManager extends SubsystemBase {
 
     public ActionManager (){
         drive.setDefaultCommand(control_drive);
+        intake.setDefaultCommand(ActionsSet.intakeCommand);
         scores_map = Map.of(1, ActionsSet.score_bottom, 2, ActionsSet.score_middle);
         stations_map = Map.of(1, ActionsSet.pickup_floor, 2, ActionsSet.pickup_single);
         level = 1;
